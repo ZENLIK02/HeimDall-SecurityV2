@@ -69,13 +69,14 @@ if run_btn:
         sast_output = "sast_results.json"
         payload = {}
         decision = ""
+        ai_confidence = 50  # ค่าตั้งต้นความมั่นใจของ AI
+        verdict_type = "warning"
         http_status = None
         
         if os.path.exists(temp_dir): shutil.rmtree(temp_dir)
         os.makedirs(temp_dir, exist_ok=True)
 
         try:
-            # ใช้ st.status เพื่อรวมขั้นตอนการทำงานไว้ในกล่องเดียว (ดูสวยและล้ำมาก)
             with st.status("🔄 ระบบกำลังดำเนินการ กรุณารอสักครู่...", expanded=True) as status:
                 
                 # --- Step 1: SAST ---
@@ -84,8 +85,12 @@ if run_btn:
                 with open(zip_path, "wb") as f: f.write(uploaded_file.getbuffer())
                 with zipfile.ZipFile(zip_path, 'r') as zip_ref: zip_ref.extractall(temp_dir)
 
+                # อัปเดต: สแกนแบบเจาะจงหา Secrets (รหัสผ่านหลุด) และ Python Bug
                 st.write("🔍 สแกน Source Code ด้วย Semgrep...")
-                subprocess.run(f"semgrep scan --config auto --json -o {sast_output} {temp_dir}", shell=True, capture_output=True)
+                subprocess.run(
+                    ["semgrep", "scan", "--config", "p/secrets", "--config", "p/python", "--json", "-o", sast_output, temp_dir], 
+                    capture_output=True
+                )
 
                 if os.path.exists(sast_output):
                     with open(sast_output, "r", encoding="utf-8") as f: sast_data = json.load(f)
@@ -100,20 +105,27 @@ if run_btn:
                         "message": vuln.get("extra", {}).get("message")
                     }
                     
-                    # --- Step 2: AI Payload ---
-                    st.write("🧠 AI กำลังสร้าง Exploit Payload...")
+                    # --- Step 2: AI Payload & Confidence ---
+                    st.write("🧠 AI กำลังประเมินและสร้าง Exploit Payload...")
                     client = OpenAI(api_key=user_api_key)
                     base_url = target_url if target_url else "http://localhost"
                     
+                    # อัปเดต: สั่งให้ AI คืนค่าคะแนนความมั่นใจ (Confidence Score) กลับมาด้วย
                     res_payload = client.chat.completions.create(
                         model="gpt-4o-mini",
                         response_format={"type": "json_object"},
                         messages=[
-                            {"role": "system", "content": f"You are a DAST Payload Generator. Return JSON: 'method', 'url' (start with {base_url}), 'headers', 'data'."},
+                            {"role": "system", "content": f"You are a DAST Payload Generator. Return JSON: 'method', 'url' (start with {base_url}), 'headers', 'data', and 'confidence_score' (integer 0-100 indicating how confident you are that this SAST finding is a real vulnerability)."},
                             {"role": "user", "content": f"สร้าง Payload สำหรับช่องโหว่: {json.dumps(vuln_info, ensure_ascii=False)}"}
                         ]
                     )
-                    payload = json.loads(res_payload.choices[0].message.content)
+                    payload_data = json.loads(res_payload.choices[0].message.content)
+                    
+                    # แยกข้อมูล Payload กับคะแนนความมั่นใจออกจากกัน
+                    payload = {k: v for k, v in payload_data.items() if k != 'confidence_score'}
+                    ai_confidence = payload_data.get("confidence_score", 50)
+                    decision = "จำลอง Payload เท่านั้น (ไม่ได้ยิงจริง)"
+                    verdict_type = "warning"
 
                     # --- Step 3: DAST & Validation ---
                     if target_url and consent:
@@ -135,12 +147,26 @@ if run_btn:
                             st.write("🤖 AI กำลังวิเคราะห์ผลการโจมตี...")
                             val_res = client.chat.completions.create(
                                 model="gpt-4o-mini",
-                                messages=[{"role": "user", "content": f"โจมตีได้ Status {http_status}, Response: {res_text}. สำเร็จ(True Positive) หรือ ล้มเหลว(False Positive)? ตอบสั้นๆ พร้อมเหตุผล"}]
+                                response_format={"type": "json_object"},
+                                messages=[
+                                    {"role": "system", "content": "You are a validation AI. Return JSON with 'verdict' (either 'True Positive' or 'False Positive'), 'confidence' (integer 0-100), and 'reason'."},
+                                    {"role": "user", "content": f"โจมตีได้ Status {http_status}, Response: {res_text}. สำเร็จ(True Positive) หรือ ล้มเหลว(False Positive)?"}
+                                ]
                             )
-                            decision = val_res.choices[0].message.content
+                            val_data = json.loads(val_res.choices[0].message.content)
                             
+                            decision = val_data.get("reason", "")
+                            ai_confidence = val_data.get("confidence", 50)
+                            
+                            if "False Positive" in val_data.get("verdict", ""):
+                                verdict_type = "success"
+                            else:
+                                verdict_type = "danger"
+                                
                         except requests.exceptions.RequestException as e:
-                            decision = f"Error: เชื่อมต่อเป้าหมายไม่ได้ ({e})"
+                            # อัปเดต: ถ้าเป้าหมายปิดอยู่ หรือเชื่อมต่อไม่ได้ ให้แจ้งเป็น Network Error
+                            decision = f"ตรวจสอบว่าเซิร์ฟเวอร์เปิดอยู่หรือไม่: {e}"
+                            verdict_type = "error"
                             
                 status.update(label="✅ การวิเคราะห์เสร็จสมบูรณ์!", state="complete", expanded=False)
 
@@ -157,14 +183,23 @@ if run_btn:
                     st.error("🚨 SAST Alert (ตรวจพบความเสี่ยง)")
                     st.write(f"**ไฟล์:** `{vuln_info['file']}` (บรรทัด {vuln_info['line']})")
                     st.write(f"**สาเหตุ:** {vuln_info['message']}")
+                    
+                    # --- อัปเดต: แสดง UI แถบวัดความมั่นใจของ AI ---
+                    st.markdown("---")
+                    st.write("**🧠 ความมั่นใจของ AI (AI Confidence Score)**")
+                    st.progress(ai_confidence / 100)
+                    st.metric(label="ระดับความน่าจะเป็นช่องโหว่จริง", value=f"{ai_confidence}%")
                 
                 with res_col2:
                     if target_url and consent:
-                        if "False Positive" in decision:
+                        if verdict_type == "success":
                             st.success("🛡️ AI Verdict: False Positive (แจ้งเตือนขยะ)")
-                        else:
+                        elif verdict_type == "danger":
                             st.warning("⚠️ AI Verdict: True Positive (อันตรายจริง)")
-                        st.write(f"**เหตุผล:** {decision}")
+                        elif verdict_type == "error":
+                            st.error("🔌 Network Error: เชื่อมต่อเป้าหมายไม่ได้")
+                            
+                        st.write(f"**ผลลัพธ์/เหตุผล:** {decision}")
                     else:
                         st.info("💡 ข้ามการทดสอบเจาะระบบ")
                         st.write("ระบบจำลองเฉพาะ Payload เนื่องจากผู้ใช้ไม่ได้ระบุ Target URL สำหรับการยิงทดสอบจริง")
