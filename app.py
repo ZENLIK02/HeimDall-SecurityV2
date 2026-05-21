@@ -165,7 +165,10 @@ def payload_prompt(finding, base_url):
                 "Return only JSON with keys: method, path, headers, params, json, data, "
                 "confidence_score, expected_signal, reasoning. "
                 "Use the smallest harmless proof-of-concept payload possible. "
-                "The path must be relative unless the finding clearly provides a route. "
+                "Do not invent API endpoints. If the finding does not clearly provide "
+                "an HTTP route, use path '/' and explain the uncertainty in reasoning. "
+                "For Streamlit apps, most user interactions are not normal REST routes, "
+                "so prefer '/' unless a real endpoint is visible in the finding. "
                 f"The target base URL is {base_url}."
             ),
         },
@@ -202,7 +205,7 @@ def send_probe(request_spec):
             headers=request_spec["headers"],
             params=request_spec["params"],
             timeout=10,
-            allow_redirects=False,
+            allow_redirects=True,
         )
 
     return requests.request(
@@ -213,8 +216,51 @@ def send_probe(request_spec):
         json=request_spec["json"],
         data=request_spec["data"],
         timeout=10,
-        allow_redirects=False,
+        allow_redirects=True,
     )
+
+
+def summarize_response(response):
+    redirect_chain = [
+        {
+            "status_code": item.status_code,
+            "url": item.url,
+            "location": item.headers.get("Location", ""),
+        }
+        for item in response.history
+    ]
+    body = response.text or ""
+
+    return {
+        "status_code": response.status_code,
+        "original_url": response.request.url if response.request else "",
+        "final_url": response.url,
+        "redirect_chain": redirect_chain,
+        "content_type": response.headers.get("Content-Type", ""),
+        "body_length": len(body),
+        "headers": dict(response.headers),
+        "body_excerpt": body[:1200],
+    }
+
+
+def response_excerpt_for_display(evidence):
+    if evidence["body_excerpt"]:
+        return evidence["body_excerpt"]
+
+    lines = [
+        "No response body was returned.",
+        f"HTTP status: {evidence['status_code']}",
+        f"Original URL: {evidence['original_url']}",
+        f"Final URL: {evidence['final_url']}",
+        f"Content-Type: {evidence['content_type'] or '(none)'}",
+    ]
+    if evidence["redirect_chain"]:
+        lines.append("Redirect chain:")
+        for redirect in evidence["redirect_chain"]:
+            location = redirect["location"] or redirect["url"]
+            lines.append(f"- {redirect['status_code']} -> {location}")
+
+    return "\n".join(lines)
 
 
 def heuristic_verdict(status_code, response_text, expected_signal):
@@ -374,7 +420,8 @@ if findings:
 
                 try:
                     response = send_probe(request_spec)
-                    response_text = response.text[:1200]
+                    response_evidence = summarize_response(response)
+                    response_text = response_evidence["body_excerpt"]
                     verdict, confidence, reason = heuristic_verdict(
                         response.status_code,
                         response_text,
@@ -400,8 +447,7 @@ if findings:
                                         {
                                             "finding": selected_finding,
                                             "request": request_spec,
-                                            "status_code": response.status_code,
-                                            "response_excerpt": response_text,
+                                            "response": response_evidence,
                                             "heuristic_verdict": verdict,
                                             "heuristic_confidence": confidence,
                                             "heuristic_reason": reason,
@@ -418,8 +464,21 @@ if findings:
                     st.json({"verdict": verdict, "confidence": confidence, "reason": reason})
                     st.write("AI verdict")
                     st.json(ai_verdict)
-                    with st.expander("Response excerpt"):
-                        st.code(response_text)
+                    with st.expander("HTTP evidence", expanded=True):
+                        st.json(
+                            {
+                                "status_code": response_evidence["status_code"],
+                                "original_url": response_evidence["original_url"],
+                                "final_url": response_evidence["final_url"],
+                                "redirect_chain": response_evidence["redirect_chain"],
+                                "content_type": response_evidence["content_type"],
+                                "body_length": response_evidence["body_length"],
+                            }
+                        )
+                    with st.expander("Response excerpt", expanded=True):
+                        st.code(response_excerpt_for_display(response_evidence))
+                    with st.expander("Response headers"):
+                        st.json(response_evidence["headers"])
                 except requests.RequestException as exc:
                     st.error(f"DAST request failed: {exc}")
             else:
