@@ -1,89 +1,52 @@
-#  AI-ASOC: Automated Security Orchestration & Correlation
+# HeimDall AI-ASOC
 
-A centralized AI system acting as an Automated Pentester. It is designed to filter out False Positives from SAST (Static Application Security Testing) alerts and automatically validate real vulnerabilities with empirical evidence. 
+HeimDall is a Streamlit-based security lab tool for combining SAST findings with optional DAST-style validation. Upload a source-code ZIP, let Semgrep rank the findings, then choose one finding for AI-assisted payload generation and evidence review.
 
-Developed for the **Leagues of Code AI & Cybersecurity Hackathon**.
+This project is intended for authorized testing and classroom/lab use only.
 
----
+## What Improved
 
-##  Prerequisites
-Before you begin, ensure you have met the following requirements:
-* **Python 3.8+**
-* **Docker Desktop** (required to run the vulnerable target environment)
-* **OpenAI API Key** (must have available billing credits)
----
+- Safe ZIP extraction blocks path traversal and skips dependency folders such as `node_modules`, `.git`, and `__pycache__`.
+- SAST-only mode no longer requires an OpenAI API key.
+- Semgrep failures are shown clearly instead of silently producing empty results.
+- All findings are ranked and displayed instead of only using the first result.
+- Users choose which finding to validate.
+- DAST validation requires an explicit authorization checkbox.
+- AI verdicts are combined with simple HTTP-response heuristics for better accuracy.
+- API keys are read from Streamlit input or `OPENAI_API_KEY`, not hardcoded in source files.
 
-##  Installation
+## Local Setup
 
-**1. Clone the repository:**
-`git clone <your_github_link_here>`
-`cd AI-ASOC-Hackathon`
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+streamlit run app.py
+```
 
-**2. Create and activate a Virtual Environment:**
-* **Windows:**
-  `python -m venv asoc_env`
-  `asoc_env\Scripts\activate`
-* **Mac/Linux:**
-  `python3 -m venv asoc_env`
-  `source asoc_env/bin/activate`
+For macOS/Linux:
 
-**3. Install required libraries:**
-`pip install requests openai streamlit semgrep`
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+streamlit run app.py
+```
 
-**4. Configure the API Key:**
-Open `app.py` and `dast_executor.py` in your code editor and insert your OpenAI API Key into the designated variable:
-`api_key = "sk-proj-xxxxxxxxxxxxxxxxxxxxxxxx"`
+## Using The App
 
----
-##  How to Run (Demo Flow)
+1. Prepare a small source-code ZIP, such as `website_easy_sast_test.zip`.
+2. Upload the ZIP in the HeimDall web UI.
+3. Click `Run SAST Scan`.
+4. Review the ranked Semgrep findings.
+5. Optionally add your OpenAI API key, a target URL that you own or are authorized to test, and confirm authorization.
+6. Choose a finding and click `Generate Payload and Validate`.
 
-Testing the system consists of 3 main steps:
+## Useful Environment Variables
 
-### Step 1: Start the Target Environment
-We use OWASP Juice Shop as our vulnerable target application. Open a new Command Prompt and run:
-`docker run --rm -p 3000:3000 bkimminich/juice-shop`
-*(The target application will be running at `http://localhost:3000`)*
+```bash
+set OPENAI_API_KEY=sk-...
+set HEIMDALL_TARGET_URL=http://localhost:3000
+```
 
-### Step 2: Execute Source Code Scan (SAST)
-Go back to your project terminal (where `(asoc_env)` is activated) and run a Semgrep scan against the Juice Shop source code folder:
-*(Note: You must download the Juice Shop source code to your local machine first)*
-`semgrep scan --config auto --json -o sast_results.json <path_to_juice_shop_folder>`
-Once completed, a `sast_results.json` file will be generated in your project directory.
-
-### Step 3: Launch the Dashboard (AI Orchestration & DAST)
-Run the following command to start the Streamlit web application:
-`streamlit run app.py`
-
-* The web interface will display the SAST scan results.
-* Click the **" Run AI-ASOC (Analyze & Exploit)"** button.
-* The AI will read the vulnerable code, generate an exploit payload, and fire it at the target system (DAST). It will then analyze the HTTP response and declare whether the vulnerability is a **True Positive** or **False Positive**.
-
----
-
-##  Custom Target Testing (Bring Your Own Code)
-
-If you want to use the AI-ASOC system to test your own application or source code, follow these steps:
-
-**1. Prepare the Target Application:**
-* Our AI requires a "live target" to execute payloads.
-* Run your application locally (e.g., start your NodeJS or Python Flask server at `http://localhost:8080`).
-
-**2. Run SAST on Your Custom Code:**
-Use Semgrep to scan your project directory and generate the vulnerability map. **You must name the output file exactly as the system expects**:
-`semgrep scan --config auto --json -o sast_results.json <path_to_your_project_folder>`
-*(Ensure the new `sast_results.json` overwrites the existing one in the `AI-ASOC-Hackathon` folder)*
-
-**3. Modify the AI Prompt:**
-Open `app.py` (around line 46) and change the target URL from the default Juice Shop (`localhost:3000`) to your application's URL (`localhost:8080`):
-
-**Before:**
-`{"role": "system", "content": "You are a DAST Payload Generator... (Always prefix URL with http://localhost:3000)..."}`
-
-**After (Assuming your app runs on port 8080):**
-`{"role": "system", "content": "You are a DAST Payload Generator... (Always prefix URL with http://localhost:8080)..."}`
-
-**4. Execute:**
-Run `streamlit run app.py` again. The system will read the new JSON file, and the AI will attempt to generate a targeted payload to exploit your custom application!
-
----
-*Developed by: บังมาเหนือผมเหลือไร*
+`HEIMDALL_TARGET_URL` is used by the optional `dast_executor.py` helper. The main Streamlit app uses the target URL field in the sidebar.

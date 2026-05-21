@@ -1,83 +1,80 @@
 import json
+import os
+import sys
+from urllib.parse import urljoin, urlparse
+
 import requests
 from openai import OpenAI
 
-# 1. ใส่ API Key ของคุณตรงนี้ (ใช้ Key เดียวกับ Phase 3)
-api_key = "sk-proj-" 
-client = OpenAI(api_key=api_key)
 
-def run_dast_and_validate():
-    print("🔫 [DAST] กำลังเตรียมกระสุน (อ่าน Payload จาก Phase 3)...")
+def build_url(base_url, raw_path):
+    parsed = urlparse(raw_path)
+    if parsed.scheme and parsed.netloc:
+        return raw_path
+    return urljoin(base_url.rstrip("/") + "/", str(raw_path or "/").lstrip("/"))
+
+
+def main():
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        print("Set OPENAI_API_KEY before running this helper.")
+        return 1
+
+    base_url = os.getenv("HEIMDALL_TARGET_URL", "http://localhost:3000")
+
     try:
-        with open("dast_payload.json", "r", encoding="utf-8") as f:
-            payload = json.load(f)
-    except Exception as e:
-        print("❌ ไม่พบไฟล์ dast_payload.json ต้องรัน Phase 3 ก่อน")
-        return
+        with open("dast_payload.json", "r", encoding="utf-8") as file:
+            payload = json.load(file)
+    except OSError as exc:
+        print(f"Could not read dast_payload.json: {exc}")
+        return 1
 
-    method = payload.get("method", "GET").upper()
-    raw_url = payload.get("url", "")
-    
-    # ถ้า URL ไม่มี http นำหน้า ให้ชี้เป้าไปที่ localhost:3000
-    if not raw_url.startswith("http"):
-        target_url = f"http://localhost:3000{raw_url}"
-    else:
-        target_url = raw_url
+    method = str(payload.get("method", "GET")).upper()
+    target_url = build_url(base_url, payload.get("path") or payload.get("url") or "/")
+    headers = payload.get("headers") or {}
+    params = payload.get("params") or {}
+    json_body = payload.get("json")
+    data = payload.get("data")
 
-    headers = payload.get("headers", {})
-    data = payload.get("data", "")
-
-    print(f"🚀 กำลังยิงจรวดไปที่: [{method}] {target_url}")
-
-    # 2. ยิง HTTP Request ไปที่เป้าหมาย
     try:
-        if method == "GET":
-            response = requests.get(target_url, headers=headers, params=data, timeout=5)
-        else:
-            # ตรวจสอบว่าต้องส่งข้อมูลเป็น JSON หรือข้อความปกติ
-            if "application/json" in str(headers).lower() and isinstance(data, dict):
-                 response = requests.post(target_url, headers=headers, json=data, timeout=5)
-            else:
-                 response = requests.request(method, target_url, headers=headers, data=data, timeout=5)
-        
-        http_status = response.status_code
-        # เอาคำตอบมาแค่ 500 ตัวอักษร เพื่อไม่ให้ข้อความยาวเกินไปตอนส่งให้ AI
-        response_text = response.text[:500] 
-        
-        print(f"🎯 ผลลัพธ์การยิง (Status Code): {http_status}")
-        
-    except requests.exceptions.ConnectionError:
-        print("❌ ยิงไม่สำเร็จ: ไม่สามารถเชื่อมต่อเป้าหมายได้ (ลืมเปิด Docker Juice Shop หรือเปล่า?)")
-        return
-    except Exception as e:
-        print(f"❌ เกิดข้อผิดพลาดในการยิง: {e}")
-        return
+        response = requests.request(
+            method,
+            target_url,
+            headers=headers,
+            params=params,
+            json=json_body,
+            data=data,
+            timeout=10,
+            allow_redirects=False,
+        )
+    except requests.RequestException as exc:
+        print(f"DAST request failed: {exc}")
+        return 1
 
-    # 3. ให้ AI ช่วยวิเคราะห์ผลลัพธ์ (Validation)
-    print("🧠 กำลังส่งผลลัพธ์ให้ AI ยืนยันว่าเป็น True หรือ False Positive...")
-    validation_prompt = f"""
-    คุณคือผู้เชี่ยวชาญด้าน Cyber Security
-    นี่คือผลลัพธ์จากการนำ Exploit Payload ไปยิงทดสอบระบบ:
-    - HTTP Status Code: {http_status}
-    - Response Text: {response_text}
+    evidence = {
+        "method": method,
+        "url": target_url,
+        "status_code": response.status_code,
+        "response_excerpt": response.text[:1200],
+    }
 
-    จงวิเคราะห์ว่าการโจมตีนี้สำเร็จหรือไม่?
-    - หากสำเร็จ (เจาะเข้า, ข้อมูลรั่วไหล, หรือเกิด Error ของระบบฐานข้อมูล) ให้ขึ้นต้นว่า "True Positive:" 
-    - หากไม่สำเร็จ (เช่น 404 Not Found, 403 Forbidden, 401 Unauthorized หรือไม่มีอะไรพัง) ให้ขึ้นต้นว่า "False Positive:"
-    
-    พร้อมอธิบายเหตุผลสั้นๆ 1-2 บรรทัด
-    """
-
+    client = OpenAI(api_key=api_key)
     ai_response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[{"role": "user", "content": validation_prompt}]
+        response_format={"type": "json_object"},
+        messages=[
+            {
+                "role": "system",
+                "content": "Return JSON with verdict, confidence, and reason based only on the HTTP evidence.",
+            },
+            {"role": "user", "content": json.dumps(evidence, ensure_ascii=False)},
+        ],
     )
 
-    print("\n==============================================")
-    print("🛡️ คำตัดสินจากระบบ AI-ASOC Orchestrator 🛡️")
-    print("==============================================")
+    print(json.dumps(evidence, indent=2, ensure_ascii=False))
     print(ai_response.choices[0].message.content)
-    print("==============================================")
+    return 0
+
 
 if __name__ == "__main__":
-    run_dast_and_validate()
+    sys.exit(main())
