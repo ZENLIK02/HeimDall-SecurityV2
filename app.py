@@ -156,6 +156,86 @@ def sort_findings(findings):
     )
 
 
+def static_fix_guidance(finding):
+    rule_text = f"{finding.get('rule_id', '')} {finding.get('message', '')}".lower()
+
+    if "sql" in rule_text or "sqli" in rule_text:
+        return {
+            "risk": "User input may reach a SQL query without parameterization.",
+            "fix_steps": [
+                "Replace string-built SQL with parameterized queries or ORM-safe filters.",
+                "Validate expected input shape before querying.",
+                "Avoid returning raw database errors to users.",
+            ],
+            "safe_pattern": "cursor.execute('SELECT * FROM users WHERE name = ?', (username,))",
+        }
+
+    if "command" in rule_text or "shell" in rule_text or "subprocess" in rule_text:
+        return {
+            "risk": "User input may be executed by the operating system.",
+            "fix_steps": [
+                "Avoid shell=True.",
+                "Pass command arguments as a list.",
+                "Allowlist expected values such as known hostnames or commands.",
+            ],
+            "safe_pattern": "subprocess.run(['ping', '-c', '1', host], check=True, capture_output=True, text=True)",
+        }
+
+    if "xss" in rule_text or "html" in rule_text:
+        return {
+            "risk": "User-controlled text may be rendered as HTML or script.",
+            "fix_steps": [
+                "Render user text as plain text.",
+                "Escape or sanitize HTML with a trusted sanitizer.",
+                "Avoid unsafe HTML rendering unless the content is trusted.",
+            ],
+            "safe_pattern": "st.write(display_name)",
+        }
+
+    if "secret" in rule_text or "credential" in rule_text or "password" in rule_text:
+        return {
+            "risk": "A secret or credential appears to be stored in source code.",
+            "fix_steps": [
+                "Move the secret to environment variables or a secret manager.",
+                "Rotate the exposed credential immediately.",
+                "Add secret scanning to CI before code is merged.",
+            ],
+            "safe_pattern": "api_key = os.getenv('OPENAI_API_KEY')",
+        }
+
+    if "pickle" in rule_text or "deserialization" in rule_text or "yaml.load" in rule_text:
+        return {
+            "risk": "Untrusted serialized data may lead to code execution.",
+            "fix_steps": [
+                "Do not deserialize untrusted data with unsafe loaders.",
+                "Use JSON or a strict schema for user-provided data.",
+                "For YAML, use yaml.safe_load instead of yaml.load.",
+            ],
+            "safe_pattern": "config = yaml.safe_load(user_yaml)",
+        }
+
+    if "md5" in rule_text or "sha1" in rule_text or "weak" in rule_text:
+        return {
+            "risk": "Weak cryptography may make stored values easier to crack or forge.",
+            "fix_steps": [
+                "Use a modern password hashing function for passwords.",
+                "Use SHA-256 or stronger only for non-password integrity hashing.",
+                "Add salts and work factors where appropriate.",
+            ],
+            "safe_pattern": "hashlib.sha256(data).hexdigest()",
+        }
+
+    return {
+        "risk": "This pattern may be unsafe depending on runtime context.",
+        "fix_steps": [
+            "Trace whether user-controlled input can reach the reported code.",
+            "Add validation, encoding, or parameterization at the trust boundary.",
+            "Add a regression test that covers the vulnerable data flow.",
+        ],
+        "safe_pattern": "Review the Semgrep message and replace the risky data flow with a framework-safe API.",
+    }
+
+
 def payload_prompt(finding, base_url):
     return [
         {
@@ -294,6 +374,47 @@ def heuristic_verdict(status_code, response_text, expected_signal):
     return "Needs Review", 50, "No strong positive or negative signal was observed."
 
 
+def final_validation_status(heuristic_verdict_text, ai_verdict):
+    combined = f"{heuristic_verdict_text} {ai_verdict.get('verdict', '')}".lower()
+
+    if "true positive" in combined or "likely true positive" in combined:
+        return "True Positive", False
+    if "false positive" in combined or "likely false positive" in combined:
+        return "False Positive", True
+    return "Needs Review", None
+
+
+def normalize_optional_bool(value):
+    if isinstance(value, bool) or value is None:
+        return value
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in ("true", "yes", "1"):
+            return True
+        if normalized in ("false", "no", "0"):
+            return False
+    return None
+
+
+def render_validation_status(status, is_false_positive):
+    is_false_positive = normalize_optional_bool(is_false_positive)
+
+    if status == "True Positive":
+        st.error("Validation Status: True Positive")
+        st.write("This finding looks real enough that a developer should fix it.")
+    elif status == "False Positive":
+        st.success("Validation Status: False Positive")
+        st.write("The available evidence does not show an exploitable issue.")
+    else:
+        st.warning("Validation Status: Needs Review")
+        st.write("Heimdall does not have enough evidence to safely call this true or false.")
+
+    if is_false_positive is None:
+        st.metric("False positive?", "Unclear")
+    else:
+        st.metric("False positive?", "Yes" if is_false_positive else "No")
+
+
 with st.sidebar:
     st.header("Settings")
     user_api_key = st.text_input(
@@ -387,6 +508,8 @@ if findings:
     with left:
         st.subheader("Selected Finding")
         st.json(selected_finding)
+        st.subheader("Developer Guidance")
+        st.json(static_fix_guidance(selected_finding))
 
     with right:
         st.subheader("Validation")
@@ -436,9 +559,15 @@ if findings:
                                 {
                                     "role": "system",
                                     "content": (
-                                        "Return JSON with verdict, confidence, and reason. "
+                                        "Return JSON with keys: verdict, is_false_positive, confidence, "
+                                        "reason, evidence_summary, developer_fix_summary, fix_steps, "
+                                        "suggested_code_change, and test_recommendation. "
+                                        "verdict must be one of: True Positive, False Positive, Needs Review. "
+                                        "is_false_positive must be true, false, or null. "
                                         "Use only the provided SAST finding and HTTP evidence. "
-                                        "Do not claim exploitation succeeded unless the evidence supports it."
+                                        "Do not claim exploitation succeeded unless the evidence supports it. "
+                                        "Write developer-facing remediation advice aligned with an AI-ASOC report: "
+                                        "validation status, targeted payload evidence, HTTP evidence, and fix guidance."
                                     ),
                                 },
                                 {
@@ -458,12 +587,40 @@ if findings:
                             ],
                         )
                     ai_verdict = json.loads(ai_review.choices[0].message.content)
+                    final_status, is_false_positive = final_validation_status(verdict, ai_verdict)
 
                     st.metric("HTTP status", response.status_code)
-                    st.write("Heuristic verdict")
-                    st.json({"verdict": verdict, "confidence": confidence, "reason": reason})
-                    st.write("AI verdict")
-                    st.json(ai_verdict)
+                    render_validation_status(
+                        ai_verdict.get("verdict", final_status),
+                        normalize_optional_bool(ai_verdict.get("is_false_positive", is_false_positive)),
+                    )
+                    st.subheader("Why HeimDall Decided This")
+                    st.json(
+                        {
+                            "heuristic": {"verdict": verdict, "confidence": confidence, "reason": reason},
+                            "ai": {
+                                "verdict": ai_verdict.get("verdict", final_status),
+                                "confidence": ai_verdict.get("confidence", "UNKNOWN"),
+                                "reason": ai_verdict.get("reason", ""),
+                                "evidence_summary": ai_verdict.get("evidence_summary", ""),
+                            },
+                        }
+                    )
+                    st.subheader("What The Developer Should Fix")
+                    st.json(
+                        {
+                            "summary": ai_verdict.get("developer_fix_summary", ""),
+                            "fix_steps": ai_verdict.get("fix_steps", static_fix_guidance(selected_finding)["fix_steps"]),
+                            "suggested_code_change": ai_verdict.get(
+                                "suggested_code_change",
+                                static_fix_guidance(selected_finding)["safe_pattern"],
+                            ),
+                            "test_recommendation": ai_verdict.get(
+                                "test_recommendation",
+                                "Add a regression test proving the unsafe input is handled safely.",
+                            ),
+                        }
+                    )
                     with st.expander("HTTP evidence", expanded=True):
                         st.json(
                             {
