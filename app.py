@@ -34,14 +34,121 @@ st.set_page_config(page_title="HeimDall AI-ASOC", page_icon="HD", layout="wide")
 st.markdown(
     """
     <style>
-    .stButton>button { width: 100%; border-radius: 8px; font-weight: 700; }
-    .main-title { font-size: 2.35rem; font-weight: 800; color: #1E3A8A; text-align: center; margin-bottom: 0; }
-    .sub-title { font-size: 1.05rem; color: #4B5563; text-align: center; margin-bottom: 1.8rem; }
-    .small-note { color: #6B7280; font-size: .92rem; }
+    :root {
+        --heimdall-blue: #2563eb;
+        --heimdall-ink: #f8fafc;
+        --heimdall-muted: #cbd5e1;
+        --heimdall-line: rgba(148, 163, 184, .28);
+        --heimdall-soft: rgba(37, 99, 235, .14);
+        --heimdall-panel: rgba(15, 23, 42, .68);
+    }
+
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+        max-width: 1180px;
+    }
+
+    .stButton>button {
+        width: 100%;
+        border-radius: 8px;
+        font-weight: 700;
+        min-height: 2.75rem;
+        border: 1px solid var(--heimdall-line);
+        transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+    }
+
+    .stButton>button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, .12);
+        border-color: rgba(37, 99, 235, .45);
+    }
+
+    .main-title {
+        font-size: 2.45rem;
+        font-weight: 850;
+        color: var(--heimdall-ink);
+        text-align: center;
+        margin-bottom: .35rem;
+        letter-spacing: 0;
+    }
+
+    .sub-title {
+        font-size: 1.05rem;
+        color: var(--heimdall-muted);
+        text-align: center;
+        margin-bottom: 1.4rem;
+    }
+
+    .hero-block {
+        border: 1px solid var(--heimdall-line);
+        border-radius: 8px;
+        padding: 1.4rem 1.25rem;
+        margin-bottom: 1.25rem;
+        background: linear-gradient(180deg, rgba(37, 99, 235, .16), rgba(15, 23, 42, .72));
+    }
+
+    .section-heading {
+        border: 1px solid var(--heimdall-line);
+        border-left: 5px solid var(--heimdall-blue);
+        border-radius: 8px;
+        padding: .9rem 1rem;
+        margin: 1.15rem 0 .7rem 0;
+        background: linear-gradient(90deg, rgba(37, 99, 235, .18), rgba(15, 23, 42, .62));
+        box-shadow: 0 8px 22px rgba(15, 23, 42, .05);
+    }
+
+    .section-heading h2 {
+        margin: 0;
+        color: var(--heimdall-ink);
+        font-size: 1.12rem;
+        line-height: 1.35;
+        letter-spacing: 0;
+    }
+
+    .section-heading p {
+        margin: .25rem 0 0 0;
+        color: var(--heimdall-muted);
+        font-size: .92rem;
+    }
+
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        border-radius: 8px;
+        border-color: var(--heimdall-line);
+        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
+    }
+
+    div[data-testid="stExpander"] {
+        border-radius: 8px;
+        border-color: var(--heimdall-line);
+        overflow: hidden;
+    }
+
+    div[data-testid="stMetric"] {
+        border: 1px solid var(--heimdall-line);
+        border-radius: 8px;
+        padding: .85rem 1rem;
+        background: rgba(148, 163, 184, .06);
+    }
+
+    .small-note { color: var(--heimdall-muted); font-size: .92rem; }
     </style>
     """,
     unsafe_allow_html=True,
 )
+
+
+def section_header(title, description=""):
+    description_html = f"<p>{description}</p>" if description else ""
+    st.markdown(
+        f"""
+        <div class="section-heading">
+            <h2>{title}</h2>
+            {description_html}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def normalize_zip_member(member_name):
@@ -427,14 +534,25 @@ with st.sidebar:
     consent = st.checkbox("I own or am authorized to test this target")
     custom_configs = st.text_input("Semgrep configs", value=", ".join(SEMGREP_CONFIGS))
 
-st.markdown('<p class="main-title">HeimDall AI-ASOC</p>', unsafe_allow_html=True)
 st.markdown(
-    '<p class="sub-title">Upload a source ZIP, rank SAST findings, then optionally validate one against an authorized target.</p>',
+    """
+    <div class="hero-block">
+        <p class="main-title">HeimDall AI-ASOC</p>
+        <p class="sub-title">Correlate SAST findings with live HTTP evidence, then produce a developer-ready validation report.</p>
+    </div>
+    """,
     unsafe_allow_html=True,
 )
 
-uploaded_file = st.file_uploader("Upload source code ZIP", type=["zip"])
-run_btn = st.button("Run SAST Scan", type="primary")
+section_header("Source Upload", "Upload a ZIP file, then HeimDall extracts only source files and runs Semgrep.")
+with st.container(border=True):
+    upload_col, scan_col = st.columns([3, 1])
+    with upload_col:
+        uploaded_file = st.file_uploader("Upload source code ZIP", type=["zip"])
+    with scan_col:
+        st.write("")
+        st.write("")
+        run_btn = st.button("Run SAST Scan", type="primary")
 
 if "findings" not in st.session_state:
     st.session_state.findings = []
@@ -485,43 +603,52 @@ if run_btn:
                 status.update(label="SAST scan complete", state="complete", expanded=False)
 
 if st.session_state.semgrep_errors:
+    section_header("Semgrep Messages", "Warnings or tool errors from the scan are shown here.")
     with st.expander("Semgrep warnings and errors"):
         st.json(st.session_state.semgrep_errors)
 
 findings = st.session_state.findings
 if findings:
-    st.subheader("Ranked SAST Findings")
-    st.dataframe(findings, width="stretch", hide_index=True)
+    section_header("Ranked SAST Findings", "Findings are sorted by severity, file, and line so the riskiest items stay near the top.")
+    with st.container(border=True):
+        st.dataframe(findings, width="stretch", hide_index=True)
 
     finding_labels = [
         f"{idx + 1}. [{finding['severity']}] {finding['rule_id']} - {finding['file']}:{finding['line']}"
         for idx, finding in enumerate(findings)
     ]
-    selected_index = st.selectbox(
-        "Choose one finding to validate",
-        range(len(finding_labels)),
-        format_func=lambda index: finding_labels[index],
-    )
+    section_header("Finding Selection", "Choose one alert for AI-assisted payload generation and optional DAST validation.")
+    with st.container(border=True):
+        selected_index = st.selectbox(
+            "Choose one finding to validate",
+            range(len(finding_labels)),
+            format_func=lambda index: finding_labels[index],
+        )
     selected_finding = findings[selected_index]
 
     left, right = st.columns(2)
     with left:
-        st.subheader("Selected Finding")
-        st.json(selected_finding)
-        st.subheader("Developer Guidance")
-        st.json(static_fix_guidance(selected_finding))
+        section_header("Selected Finding", "The normalized Semgrep result that HeimDall will reason over.")
+        with st.container(border=True):
+            st.json(selected_finding)
+        section_header("Developer Guidance", "Immediate fix advice based on the vulnerability class.")
+        with st.container(border=True):
+            st.json(static_fix_guidance(selected_finding))
 
     with right:
-        st.subheader("Validation")
-        can_generate = bool(user_api_key)
-        if not can_generate:
-            st.info("Add an OpenAI API key to generate a validation payload.")
-        if not target_url:
-            st.info("Add a DAST target URL to send a live validation request.")
-        if target_url and not consent:
-            st.warning("Confirm authorization before sending DAST traffic.")
+        section_header("Validation", "Generate a focused payload and, when authorized, validate it against the target.")
+        with st.container(border=True):
+            can_generate = bool(user_api_key)
+            if not can_generate:
+                st.info("Add an OpenAI API key to generate a validation payload.")
+            if not target_url:
+                st.info("Add a DAST target URL to send a live validation request.")
+            if target_url and not consent:
+                st.warning("Confirm authorization before sending DAST traffic.")
 
-        if st.button("Generate Payload and Validate", disabled=not can_generate):
+            validate_btn = st.button("Generate Payload and Validate", disabled=not can_generate)
+
+        if validate_btn:
             client = OpenAI(api_key=user_api_key)
             base_url = target_url.strip() or "http://localhost"
 
@@ -533,13 +660,15 @@ if findings:
                 )
                 payload = json.loads(payload_response.choices[0].message.content)
 
-            st.write("Generated payload")
-            st.json(payload)
+            section_header("Generated Payload", "The AI-generated request candidate used for validation.")
+            with st.container(border=True):
+                st.json(payload)
 
             if target_url and consent:
                 request_spec = build_request(base_url, payload)
-                st.write("Request")
-                st.json(request_spec)
+                section_header("Request", "The exact HTTP request HeimDall will send to the authorized target.")
+                with st.container(border=True):
+                    st.json(request_spec)
 
                 try:
                     response = send_probe(request_spec)
@@ -589,53 +718,59 @@ if findings:
                     ai_verdict = json.loads(ai_review.choices[0].message.content)
                     final_status, is_false_positive = final_validation_status(verdict, ai_verdict)
 
-                    st.metric("HTTP status", response.status_code)
-                    render_validation_status(
-                        ai_verdict.get("verdict", final_status),
-                        normalize_optional_bool(ai_verdict.get("is_false_positive", is_false_positive)),
-                    )
-                    st.subheader("Why HeimDall Decided This")
-                    st.json(
-                        {
-                            "heuristic": {"verdict": verdict, "confidence": confidence, "reason": reason},
-                            "ai": {
-                                "verdict": ai_verdict.get("verdict", final_status),
-                                "confidence": ai_verdict.get("confidence", "UNKNOWN"),
-                                "reason": ai_verdict.get("reason", ""),
-                                "evidence_summary": ai_verdict.get("evidence_summary", ""),
-                            },
-                        }
-                    )
-                    st.subheader("What The Developer Should Fix")
-                    st.json(
-                        {
-                            "summary": ai_verdict.get("developer_fix_summary", ""),
-                            "fix_steps": ai_verdict.get("fix_steps", static_fix_guidance(selected_finding)["fix_steps"]),
-                            "suggested_code_change": ai_verdict.get(
-                                "suggested_code_change",
-                                static_fix_guidance(selected_finding)["safe_pattern"],
-                            ),
-                            "test_recommendation": ai_verdict.get(
-                                "test_recommendation",
-                                "Add a regression test proving the unsafe input is handled safely.",
-                            ),
-                        }
-                    )
-                    with st.expander("HTTP evidence", expanded=True):
+                    section_header("Validation Result", "The final true-positive or false-positive decision.")
+                    with st.container(border=True):
+                        st.metric("HTTP status", response.status_code)
+                        render_validation_status(
+                            ai_verdict.get("verdict", final_status),
+                            normalize_optional_bool(ai_verdict.get("is_false_positive", is_false_positive)),
+                        )
+                    section_header("Decision Evidence", "Heuristic and AI reasoning behind the final validation status.")
+                    with st.container(border=True):
                         st.json(
                             {
-                                "status_code": response_evidence["status_code"],
-                                "original_url": response_evidence["original_url"],
-                                "final_url": response_evidence["final_url"],
-                                "redirect_chain": response_evidence["redirect_chain"],
-                                "content_type": response_evidence["content_type"],
-                                "body_length": response_evidence["body_length"],
+                                "heuristic": {"verdict": verdict, "confidence": confidence, "reason": reason},
+                                "ai": {
+                                    "verdict": ai_verdict.get("verdict", final_status),
+                                    "confidence": ai_verdict.get("confidence", "UNKNOWN"),
+                                    "reason": ai_verdict.get("reason", ""),
+                                    "evidence_summary": ai_verdict.get("evidence_summary", ""),
+                                },
                             }
                         )
-                    with st.expander("Response excerpt", expanded=True):
-                        st.code(response_excerpt_for_display(response_evidence))
-                    with st.expander("Response headers"):
-                        st.json(response_evidence["headers"])
+                    section_header("Developer Fix", "Concrete remediation steps to hand to the engineering team.")
+                    with st.container(border=True):
+                        st.json(
+                            {
+                                "summary": ai_verdict.get("developer_fix_summary", ""),
+                                "fix_steps": ai_verdict.get("fix_steps", static_fix_guidance(selected_finding)["fix_steps"]),
+                                "suggested_code_change": ai_verdict.get(
+                                    "suggested_code_change",
+                                    static_fix_guidance(selected_finding)["safe_pattern"],
+                                ),
+                                "test_recommendation": ai_verdict.get(
+                                    "test_recommendation",
+                                    "Add a regression test proving the unsafe input is handled safely.",
+                                ),
+                            }
+                        )
+                    section_header("HTTP Evidence", "Response metadata, body excerpt, and headers captured during validation.")
+                    with st.container(border=True):
+                        with st.expander("Response metadata", expanded=True):
+                            st.json(
+                                {
+                                    "status_code": response_evidence["status_code"],
+                                    "original_url": response_evidence["original_url"],
+                                    "final_url": response_evidence["final_url"],
+                                    "redirect_chain": response_evidence["redirect_chain"],
+                                    "content_type": response_evidence["content_type"],
+                                    "body_length": response_evidence["body_length"],
+                                }
+                            )
+                        with st.expander("Response excerpt", expanded=True):
+                            st.code(response_excerpt_for_display(response_evidence))
+                        with st.expander("Response headers"):
+                            st.json(response_evidence["headers"])
                 except requests.RequestException as exc:
                     st.error(f"DAST request failed: {exc}")
             else:
