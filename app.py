@@ -129,11 +129,19 @@ def simplify_finding(finding, scan_root):
         "line": finding.get("start", {}).get("line"),
         "severity": extra.get("severity", "INFO"),
         "message": extra.get("message", ""),
-        "cwe": metadata.get("cwe", []),
-        "owasp": metadata.get("owasp", []),
+        "cwe": format_metadata_value(metadata.get("cwe")),
+        "owasp": format_metadata_value(metadata.get("owasp")),
         "confidence": metadata.get("confidence", "UNKNOWN"),
         "category": metadata.get("category", "security"),
     }
+
+
+def format_metadata_value(value):
+    if value is None:
+        return ""
+    if isinstance(value, (list, tuple, set)):
+        return ", ".join(str(item) for item in value)
+    return str(value)
 
 
 def sort_findings(findings):
@@ -316,7 +324,7 @@ if st.session_state.semgrep_errors:
 findings = st.session_state.findings
 if findings:
     st.subheader("Ranked SAST Findings")
-    st.dataframe(findings, use_container_width=True, hide_index=True)
+    st.dataframe(findings, width="stretch", hide_index=True)
 
     finding_labels = [
         f"{idx + 1}. [{finding['severity']}] {finding['rule_id']} - {finding['file']}:{finding['line']}"
