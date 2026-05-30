@@ -6,13 +6,17 @@ This project is intended for authorized testing and classroom/lab use only.
 
 ## What Improved
 
+- The Streamlit interface now follows the Base44 reference style: compact HD header, left control center, neutral cards, status pills, and finding summary tiles.
 - Safe ZIP extraction blocks path traversal and skips dependency folders such as `node_modules`, `.git`, and `__pycache__`.
 - SAST-only mode no longer requires an OpenAI API key.
 - Semgrep failures are shown clearly instead of silently producing empty results.
+- Semgrep is launched from PATH first, then through the active Python module path as a fallback.
 - All findings are ranked and displayed instead of only using the first result.
 - Users choose which finding to validate.
 - DAST validation requires an explicit authorization checkbox.
+- DAST target URLs are checked before live requests are sent.
 - AI verdicts are combined with simple HTTP-response heuristics for better accuracy.
+- AI JSON responses are handled safely so malformed model output does not crash the app.
 - API keys are read from Streamlit input or `OPENAI_API_KEY`, not hardcoded in source files.
 
 ## Local Setup

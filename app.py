@@ -2,6 +2,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 import zipfile
 from pathlib import Path, PurePosixPath, PureWindowsPath
@@ -29,109 +30,251 @@ DEPENDENCY_DIRS = {
 MAX_UPLOAD_MB = 25
 
 
-st.set_page_config(page_title="HeimDall AI-ASOC", page_icon="HD", layout="wide")
+st.set_page_config(page_title="HeimDall AI-ASOC", page_icon=":shield:", layout="wide")
 
 st.markdown(
     """
     <style>
     :root {
-        --heimdall-blue: #2563eb;
-        --heimdall-ink: #f8fafc;
-        --heimdall-muted: #cbd5e1;
-        --heimdall-line: rgba(148, 163, 184, .28);
-        --heimdall-soft: rgba(37, 99, 235, .14);
-        --heimdall-panel: rgba(15, 23, 42, .68);
+        --hd-background: #fbfbfc;
+        --hd-foreground: #171a21;
+        --hd-muted: #68707d;
+        --hd-muted-bg: #f3f4f6;
+        --hd-card: #ffffff;
+        --hd-border: #e3e6ea;
+        --hd-accent: #111827;
+        --hd-soft: #f8fafc;
+        --hd-danger: #dc2626;
+        --hd-warning: #d97706;
+        --hd-info: #2563eb;
+        --hd-success: #16a34a;
+    }
+
+    html, body, [data-testid="stAppViewContainer"] {
+        background: var(--hd-background);
+        color: var(--hd-foreground);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    [data-testid="stHeader"] {
+        background: transparent;
     }
 
     .block-container {
-        padding-top: 2rem;
-        padding-bottom: 3rem;
-        max-width: 1180px;
+        padding: 1.25rem 2rem 3rem;
+        max-width: 1050px;
+    }
+
+    [data-testid="stSidebar"] {
+        background: var(--hd-card);
+        border-right: 1px solid var(--hd-border);
+    }
+
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+    [data-testid="stSidebar"] label {
+        color: var(--hd-muted);
+        font-size: .84rem;
+    }
+
+    [data-testid="stSidebar"] h1,
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3 {
+        color: var(--hd-foreground);
+        font-size: .95rem;
+        letter-spacing: 0;
     }
 
     .stButton>button {
         width: 100%;
         border-radius: 8px;
-        font-weight: 700;
-        min-height: 2.75rem;
-        border: 1px solid var(--heimdall-line);
-        transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+        font-weight: 650;
+        min-height: 2.5rem;
+        border: 1px solid var(--hd-border);
+        box-shadow: none;
+        transition: background .16s ease, border-color .16s ease, transform .16s ease;
     }
 
     .stButton>button:hover {
         transform: translateY(-1px);
-        box-shadow: 0 10px 24px rgba(15, 23, 42, .12);
-        border-color: rgba(37, 99, 235, .45);
+        border-color: #c6cbd2;
     }
 
-    .main-title {
-        font-size: 2.45rem;
-        font-weight: 850;
-        color: var(--heimdall-ink);
-        text-align: center;
-        margin-bottom: .35rem;
+    .hd-topbar {
+        border-bottom: 1px solid var(--hd-border);
+        margin: -1.25rem -2rem 2rem;
+        padding: 1.15rem 2rem;
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        background: rgba(255, 255, 255, .82);
+        backdrop-filter: blur(14px);
+        position: sticky;
+        top: 0;
+        z-index: 5;
+    }
+
+    .hd-logo {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 8px;
+        background: var(--hd-accent);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .74rem;
+        font-weight: 800;
         letter-spacing: 0;
     }
 
-    .sub-title {
-        font-size: 1.05rem;
-        color: var(--heimdall-muted);
-        text-align: center;
-        margin-bottom: 1.4rem;
+    .hd-title {
+        font-size: 1rem;
+        line-height: 1.2;
+        font-weight: 700;
+        color: var(--hd-foreground);
+        letter-spacing: 0;
     }
 
-    .hero-block {
-        border: 1px solid var(--heimdall-line);
+    .hd-subtitle {
+        font-size: .78rem;
+        color: var(--hd-muted);
+        margin-top: .1rem;
+    }
+
+    .hd-card {
+        background: var(--hd-card);
+        border: 1px solid var(--hd-border);
         border-radius: 8px;
-        padding: 1.4rem 1.25rem;
-        margin-bottom: 1.25rem;
-        background: linear-gradient(180deg, rgba(37, 99, 235, .16), rgba(15, 23, 42, .72));
+        padding: 1.2rem;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, .03);
     }
 
     .section-heading {
-        border: 1px solid var(--heimdall-line);
-        border-left: 5px solid var(--heimdall-blue);
-        border-radius: 8px;
-        padding: .9rem 1rem;
-        margin: 1.15rem 0 .7rem 0;
-        background: linear-gradient(90deg, rgba(37, 99, 235, .18), rgba(15, 23, 42, .62));
-        box-shadow: 0 8px 22px rgba(15, 23, 42, .05);
+        margin: 0 0 .85rem 0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
     }
 
     .section-heading h2 {
         margin: 0;
-        color: var(--heimdall-ink);
-        font-size: 1.12rem;
+        color: var(--hd-foreground);
+        font-size: .98rem;
         line-height: 1.35;
+        font-weight: 750;
         letter-spacing: 0;
     }
 
     .section-heading p {
-        margin: .25rem 0 0 0;
-        color: var(--heimdall-muted);
-        font-size: .92rem;
+        margin: .18rem 0 0 0;
+        color: var(--hd-muted);
+        font-size: .82rem;
     }
 
     div[data-testid="stVerticalBlockBorderWrapper"] {
         border-radius: 8px;
-        border-color: var(--heimdall-line);
-        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
+        border-color: var(--hd-border);
+        background: var(--hd-card);
+        box-shadow: 0 1px 2px rgba(15, 23, 42, .03);
     }
 
     div[data-testid="stExpander"] {
         border-radius: 8px;
-        border-color: var(--heimdall-line);
+        border-color: var(--hd-border);
         overflow: hidden;
     }
 
     div[data-testid="stMetric"] {
-        border: 1px solid var(--heimdall-line);
+        border: 1px solid var(--hd-border);
         border-radius: 8px;
-        padding: .85rem 1rem;
-        background: rgba(148, 163, 184, .06);
+        padding: .8rem .95rem;
+        background: var(--hd-card);
     }
 
-    .small-note { color: var(--heimdall-muted); font-size: .92rem; }
+    .hd-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: .75rem;
+        margin: 0 0 1rem;
+    }
+
+    .hd-stat {
+        border: 1px solid var(--hd-border);
+        border-radius: 8px;
+        background: var(--hd-card);
+        padding: .85rem .95rem;
+    }
+
+    .hd-stat-label {
+        color: var(--hd-muted);
+        font-size: .72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+    }
+
+    .hd-stat-value {
+        margin-top: .15rem;
+        color: var(--hd-foreground);
+        font-size: 1.45rem;
+        font-weight: 780;
+        line-height: 1.15;
+    }
+
+    .hd-status-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .hd-pill {
+        border: 1px solid var(--hd-border);
+        border-radius: 999px;
+        background: var(--hd-card);
+        color: var(--hd-muted);
+        font-size: .78rem;
+        font-weight: 650;
+        padding: .35rem .6rem;
+    }
+
+    .hd-empty {
+        border: 1px dashed #cbd5e1;
+        border-radius: 8px;
+        background: var(--hd-soft);
+        color: var(--hd-muted);
+        min-height: 10rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 1.5rem;
+        font-size: .9rem;
+    }
+
+    .small-note {
+        color: var(--hd-muted);
+        font-size: .84rem;
+    }
+
+    @media (max-width: 760px) {
+        .block-container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .hd-topbar {
+            margin-left: -1rem;
+            margin-right: -1rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .hd-stat-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -143,12 +286,67 @@ def section_header(title, description=""):
     st.markdown(
         f"""
         <div class="section-heading">
-            <h2>{title}</h2>
-            {description_html}
+            <div>
+                <h2>{title}</h2>
+                {description_html}
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
+
+
+def render_topbar():
+    st.markdown(
+        """
+        <div class="hd-topbar">
+            <div class="hd-logo">HD</div>
+            <div>
+                <div class="hd-title">HeimDall AI-ASOC</div>
+                <div class="hd-subtitle">Authorized lab use only</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_status_row(api_key, target_url, consent):
+    ai_status = "AI ready" if api_key else "SAST-only mode"
+    target_status = "Target set" if target_url else "No DAST target"
+    auth_status = "Authorized" if consent else "Authorization needed"
+    st.markdown(
+        f"""
+        <div class="hd-status-row">
+            <span class="hd-pill">{ai_status}</span>
+            <span class="hd-pill">{target_status}</span>
+            <span class="hd-pill">{auth_status}</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_finding_summary(findings):
+    counts = {"ERROR": 0, "WARNING": 0, "INFO": 0}
+    for finding in findings:
+        counts[finding.get("severity", "INFO")] = counts.get(finding.get("severity", "INFO"), 0) + 1
+
+    st.markdown(
+        f"""
+        <div class="hd-stat-grid">
+            <div class="hd-stat"><div class="hd-stat-label">Total</div><div class="hd-stat-value">{len(findings)}</div></div>
+            <div class="hd-stat"><div class="hd-stat-label">Errors</div><div class="hd-stat-value">{counts.get("ERROR", 0)}</div></div>
+            <div class="hd-stat"><div class="hd-stat-label">Warnings</div><div class="hd-stat-value">{counts.get("WARNING", 0)}</div></div>
+            <div class="hd-stat"><div class="hd-stat-label">Info</div><div class="hd-stat-value">{counts.get("INFO", 0)}</div></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_empty_state(message):
+    st.markdown(f"""<div class="hd-empty">{message}</div>""", unsafe_allow_html=True)
 
 
 def normalize_zip_member(member_name):
@@ -202,7 +400,16 @@ def run_semgrep(scan_dir, output_path, configs):
     try:
         completed = subprocess.run(command, capture_output=True, text=True, timeout=180)
     except FileNotFoundError:
-        return None, "Semgrep is not installed in this environment."
+        module_command = [sys.executable, "-m", "semgrep", "scan"]
+        for config in configs:
+            module_command.extend(["--config", config])
+        module_command.extend(["--json", "-o", str(output_path), str(scan_dir)])
+        try:
+            completed = subprocess.run(module_command, capture_output=True, text=True, timeout=180)
+        except FileNotFoundError:
+            return None, "Semgrep is not installed in this environment."
+        except subprocess.TimeoutExpired:
+            return None, "Semgrep timed out after 180 seconds."
     except subprocess.TimeoutExpired:
         return None, "Semgrep timed out after 180 seconds."
 
@@ -218,6 +425,41 @@ def run_semgrep(scan_dir, output_path, configs):
         data.setdefault("errors", []).append({"message": stderr or "Semgrep failed."})
 
     return data, None
+
+
+def parse_json_object(raw_text, fallback_label):
+    try:
+        parsed = json.loads(raw_text)
+    except json.JSONDecodeError:
+        return {
+            "verdict": "Needs Review",
+            "is_false_positive": None,
+            "confidence": "LOW",
+            "reason": f"{fallback_label} returned text that was not valid JSON.",
+            "raw_response": raw_text,
+        }
+
+    if isinstance(parsed, dict):
+        return parsed
+
+    return {
+        "verdict": "Needs Review",
+        "is_false_positive": None,
+        "confidence": "LOW",
+        "reason": f"{fallback_label} returned JSON, but not a JSON object.",
+        "raw_response": parsed,
+    }
+
+
+def validate_target_url(target_url):
+    if not target_url:
+        return True, ""
+
+    parsed = urlparse(target_url)
+    if parsed.scheme not in ("http", "https") or not parsed.netloc:
+        return False, "DAST target URL must start with http:// or https:// and include a host."
+
+    return True, ""
 
 
 def simplify_finding(finding, scan_root):
@@ -523,7 +765,7 @@ def render_validation_status(status, is_false_positive):
 
 
 with st.sidebar:
-    st.header("Settings")
+    st.header("Control Center")
     user_api_key = st.text_input(
         "OpenAI API Key",
         type="password",
@@ -533,18 +775,15 @@ with st.sidebar:
     target_url = st.text_input("DAST Target URL", placeholder="http://localhost:3000")
     consent = st.checkbox("I own or am authorized to test this target")
     custom_configs = st.text_input("Semgrep configs", value=", ".join(SEMGREP_CONFIGS))
+    st.caption("SAST works without an API key. AI payload generation and live DAST validation require explicit setup.")
 
-st.markdown(
-    """
-    <div class="hero-block">
-        <p class="main-title">HeimDall AI-ASOC</p>
-        <p class="sub-title">Correlate SAST findings with live HTTP evidence, then produce a developer-ready validation report.</p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+render_topbar()
+render_status_row(user_api_key, target_url, consent)
+target_url_ok, target_url_error = validate_target_url(target_url.strip())
+if target_url_error:
+    st.warning(target_url_error)
 
-section_header("Source Upload", "Upload a ZIP file, then HeimDall extracts only source files and runs Semgrep.")
+section_header("Source Upload", "Upload a ZIP file, extract safe source files, and run Semgrep.")
 with st.container(border=True):
     upload_col, scan_col = st.columns([3, 1])
     with upload_col:
@@ -558,6 +797,8 @@ if "findings" not in st.session_state:
     st.session_state.findings = []
 if "semgrep_errors" not in st.session_state:
     st.session_state.semgrep_errors = []
+if "scan_history" not in st.session_state:
+    st.session_state.scan_history = []
 
 if run_btn:
     if not uploaded_file:
@@ -600,6 +841,17 @@ if run_btn:
                 findings = [simplify_finding(finding, scan_dir) for finding in raw_findings]
                 st.session_state.findings = sort_findings(findings)
                 st.session_state.semgrep_errors = sast_data.get("errors", [])
+                st.session_state.scan_history.insert(
+                    0,
+                    {
+                        "filename": uploaded_file.name,
+                        "findings_count": len(st.session_state.findings),
+                        "errors": sum(1 for item in st.session_state.findings if item["severity"] == "ERROR"),
+                        "warnings": sum(1 for item in st.session_state.findings if item["severity"] == "WARNING"),
+                        "info": sum(1 for item in st.session_state.findings if item["severity"] == "INFO"),
+                    },
+                )
+                st.session_state.scan_history = st.session_state.scan_history[:5]
                 status.update(label="SAST scan complete", state="complete", expanded=False)
 
 if st.session_state.semgrep_errors:
@@ -607,11 +859,20 @@ if st.session_state.semgrep_errors:
     with st.expander("Semgrep warnings and errors"):
         st.json(st.session_state.semgrep_errors)
 
+if st.session_state.scan_history:
+    with st.expander("Recent scan history"):
+        for scan in st.session_state.scan_history:
+            st.write(
+                f"{scan['filename']} - {scan['findings_count']} findings "
+                f"({scan['errors']} errors, {scan['warnings']} warnings, {scan['info']} info)"
+            )
+
 findings = st.session_state.findings
 if findings:
+    render_finding_summary(findings)
     section_header("Ranked SAST Findings", "Findings are sorted by severity, file, and line so the riskiest items stay near the top.")
     with st.container(border=True):
-        st.dataframe(findings, width="stretch", hide_index=True)
+        st.dataframe(findings, use_container_width=True, hide_index=True)
 
     finding_labels = [
         f"{idx + 1}. [{finding['severity']}] {finding['rule_id']} - {finding['file']}:{finding['line']}"
@@ -643,6 +904,8 @@ if findings:
                 st.info("Add an OpenAI API key to generate a validation payload.")
             if not target_url:
                 st.info("Add a DAST target URL to send a live validation request.")
+            if target_url and not target_url_ok:
+                st.warning(target_url_error)
             if target_url and not consent:
                 st.warning("Confirm authorization before sending DAST traffic.")
 
@@ -658,13 +921,13 @@ if findings:
                     response_format={"type": "json_object"},
                     messages=payload_prompt(selected_finding, base_url),
                 )
-                payload = json.loads(payload_response.choices[0].message.content)
+                payload = parse_json_object(payload_response.choices[0].message.content, "Payload generation")
 
             section_header("Generated Payload", "The AI-generated request candidate used for validation.")
             with st.container(border=True):
                 st.json(payload)
 
-            if target_url and consent:
+            if target_url and consent and target_url_ok:
                 request_spec = build_request(base_url, payload)
                 section_header("Request", "The exact HTTP request HeimDall will send to the authorized target.")
                 with st.container(border=True):
@@ -715,7 +978,7 @@ if findings:
                                 },
                             ],
                         )
-                    ai_verdict = json.loads(ai_review.choices[0].message.content)
+                    ai_verdict = parse_json_object(ai_review.choices[0].message.content, "AI evidence review")
                     final_status, is_false_positive = final_validation_status(verdict, ai_verdict)
 
                     section_header("Validation Result", "The final true-positive or false-positive decision.")
@@ -774,6 +1037,8 @@ if findings:
                 except requests.RequestException as exc:
                     st.error(f"DAST request failed: {exc}")
             else:
-                st.info("Payload generated only. Add target URL and authorization consent to run DAST.")
+                st.info("Payload generated only. Add a valid target URL and authorization consent to run DAST.")
 elif run_btn:
     st.success("No Semgrep findings were detected.")
+else:
+    render_empty_state("Upload a source ZIP and run SAST to see findings, validation evidence, and fix guidance.")
