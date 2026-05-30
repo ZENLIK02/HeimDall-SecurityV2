@@ -17,6 +17,7 @@ This project is intended for authorized testing and classroom/lab use only.
 - DAST target URLs are checked before live requests are sent.
 - AI verdicts are combined with simple HTTP-response heuristics for better accuracy.
 - AI JSON responses are handled safely so malformed model output does not crash the app.
+- AI prompts now apply prompt-injection guardrails by treating findings and HTTP evidence as untrusted data and truncating long fields before model review.
 - API keys are read from Streamlit input or `OPENAI_API_KEY`, not hardcoded in source files.
 
 ## Local Setup
