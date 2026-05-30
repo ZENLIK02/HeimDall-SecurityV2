@@ -36,18 +36,18 @@ st.markdown(
     """
     <style>
     :root {
-        --hd-background: #fbfbfc;
-        --hd-foreground: #171a21;
-        --hd-muted: #68707d;
-        --hd-muted-bg: #f3f4f6;
-        --hd-card: #ffffff;
-        --hd-border: #e3e6ea;
-        --hd-accent: #111827;
-        --hd-soft: #f8fafc;
-        --hd-danger: #dc2626;
-        --hd-warning: #d97706;
-        --hd-info: #2563eb;
-        --hd-success: #16a34a;
+        --hd-background: #0b0f17;
+        --hd-foreground: #f8fafc;
+        --hd-muted: #9aa4b2;
+        --hd-muted-bg: #151b26;
+        --hd-card: #111827;
+        --hd-border: #253041;
+        --hd-accent: #f8fafc;
+        --hd-soft: #0f172a;
+        --hd-danger: #f87171;
+        --hd-warning: #fbbf24;
+        --hd-info: #60a5fa;
+        --hd-success: #4ade80;
     }
 
     html, body, [data-testid="stAppViewContainer"] {
@@ -58,6 +58,14 @@ st.markdown(
 
     [data-testid="stHeader"] {
         background: transparent;
+    }
+
+    [data-testid="stAppViewBlockContainer"],
+    [data-testid="stMarkdownContainer"],
+    [data-testid="stWidgetLabel"],
+    [data-testid="stText"],
+    p, span, label {
+        color: var(--hd-foreground);
     }
 
     .block-container {
@@ -99,6 +107,25 @@ st.markdown(
         border-color: #c6cbd2;
     }
 
+    input, textarea, select,
+    [data-baseweb="input"],
+    [data-baseweb="textarea"],
+    [data-baseweb="select"] {
+        background: var(--hd-soft) !important;
+        color: var(--hd-foreground) !important;
+        border-color: var(--hd-border) !important;
+    }
+
+    [data-baseweb="input"] input,
+    [data-baseweb="textarea"] textarea {
+        color: var(--hd-foreground) !important;
+    }
+
+    [data-testid="stFileUploaderDropzone"] {
+        background: var(--hd-soft);
+        border-color: var(--hd-border);
+    }
+
     .hd-topbar {
         border-bottom: 1px solid var(--hd-border);
         margin: -1.25rem -2rem 2rem;
@@ -106,7 +133,7 @@ st.markdown(
         display: flex;
         align-items: center;
         gap: .75rem;
-        background: rgba(255, 255, 255, .82);
+        background: rgba(11, 15, 23, .88);
         backdrop-filter: blur(14px);
         position: sticky;
         top: 0;
@@ -118,7 +145,7 @@ st.markdown(
         height: 2rem;
         border-radius: 8px;
         background: var(--hd-accent);
-        color: #fff;
+        color: #0b0f17;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -240,7 +267,7 @@ st.markdown(
     }
 
     .hd-empty {
-        border: 1px dashed #cbd5e1;
+        border: 1px dashed #334155;
         border-radius: 8px;
         background: var(--hd-soft);
         color: var(--hd-muted);
