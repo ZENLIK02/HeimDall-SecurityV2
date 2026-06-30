@@ -7,3 +7,4 @@ sast_results.json
 dast_payload.json
 .streamlit/secrets.toml
 .streamlit_pid
+reports/
