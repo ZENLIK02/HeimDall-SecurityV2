@@ -62,6 +62,7 @@ class LLMReasoningOutput:
 class DastConfig:
     target_base_url: str = "http://127.0.0.1:3000"
     allowed_hosts: tuple[str, ...] = ("127.0.0.1", "localhost")
+    blocked_hosts: tuple[str, ...] = ()
     allow_production_targets: bool = False
     dry_run: bool = True
     timeout_seconds: float = 3.0

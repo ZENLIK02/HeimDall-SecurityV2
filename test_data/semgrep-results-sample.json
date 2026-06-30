@@ -1,0 +1,50 @@
+{
+  "version": "1.99.0",
+  "results": [
+    {
+      "check_id": "python.flask.security.xss.reflected-xss",
+      "path": "test_apps/flask_vulnerable_app/app.py",
+      "start": {"line": 18, "col": 12},
+      "extra": {
+        "severity": "HIGH",
+        "message": "User input is reflected in an HTTP response.",
+        "lines": "return f\"<h1>{request.args.get('q', '')}</h1>\"",
+        "metadata": {"cwe": "CWE-79"}
+      }
+    },
+    {
+      "check_id": "python.flask.security.sql-injection",
+      "path": "test_apps/flask_vulnerable_app/app.py",
+      "start": {"line": 25, "col": 13},
+      "extra": {
+        "severity": "HIGH",
+        "message": "String formatting is used to construct a SQL-like lookup.",
+        "lines": "query = \"SELECT * FROM users WHERE name = '%s'\" % username",
+        "metadata": {"cwe": "CWE-89"}
+      }
+    },
+    {
+      "check_id": "python.flask.security.path-traversal",
+      "path": "test_apps/flask_vulnerable_app/app.py",
+      "start": {"line": 36, "col": 16},
+      "extra": {
+        "severity": "MEDIUM",
+        "message": "User input controls a path traversal-like file lookup.",
+        "lines": "requested = request.args.get('name', 'readme.txt')",
+        "metadata": {"cwe": "CWE-22"}
+      }
+    },
+    {
+      "check_id": "python.flask.security.idor",
+      "path": "test_apps/flask_vulnerable_app/app.py",
+      "start": {"line": 47, "col": 10},
+      "extra": {
+        "severity": "LOW",
+        "message": "User object is selected by request path without an authorization check.",
+        "lines": "return jsonify(USERS.get(user_id, {}))",
+        "metadata": {"cwe": "CWE-639"}
+      }
+    }
+  ],
+  "errors": []
+}

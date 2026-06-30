@@ -1,0 +1,24 @@
+security:
+  dry_run: true
+  allowed_targets:
+    - "http://localhost:5000"
+    - "http://127.0.0.1:5000"
+  blocked_targets:
+    - "https://production.example.com"
+  fail_on_confirmed_high: true
+  fail_on_confirmed_critical: true
+  needs_review_does_not_fail: true
+
+dast:
+  max_requests_per_scan: 50
+  request_timeout_seconds: 5
+
+llm:
+  provider: "mock"
+  use_mock_llm: true
+
+reports:
+  output_dir: "reports"
+
+semgrep:
+  output_path: "semgrep-results.json"

@@ -35,6 +35,8 @@ class SafetyController:
         host = parsed.hostname or ""
         if self.config.kill_switch:
             return False, "kill switch enabled"
+        if host in self.config.blocked_hosts:
+            return False, f"target host {host!r} is explicitly blocked"
         if host not in self.config.allowed_hosts:
             return False, f"target host {host!r} is not allowlisted"
         if not self.config.allow_production_targets and not _is_local_host(host):

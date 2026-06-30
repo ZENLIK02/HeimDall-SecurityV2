@@ -155,6 +155,47 @@ Interpretation guidelines:
 
 The workflow `.github/workflows/heimdall.yml` installs dependencies, runs Semgrep when available, writes Semgrep JSON, executes Heimdall in dry-run mode with the sample dataset, uploads reports as artifacts, and fails only when the full pipeline confirms High or Critical True Positives.
 
+## DevSecOps Integration
+
+Heimdall V2 can run as a CI/CD validation backend for pull requests and pushes. The DevSecOps workflow consumes Semgrep JSON, converts findings into Heimdall alerts, runs the same safety-first validation pipeline, writes CI reports, and exits according to policy.
+
+Local commands:
+
+```bash
+python -m heimdall.cli check-config --config heimdall.yml
+python -m heimdall.cli validate --semgrep test_data/semgrep-results-sample.json --config heimdall.yml --output reports/
+python -m heimdall.cli experiment --dataset data/sample_alerts.jsonl --mode all --output reports/
+```
+
+GitHub Actions workflow:
+
+- `.github/workflows/heimdall-devsecops.yml` runs on `push` and `pull_request`.
+- Semgrep writes `semgrep-results.json`.
+- Heimdall writes `reports/ci_summary.md`, `reports/ci_results.json`, and `reports/ci_results.csv`.
+- Reports are uploaded as workflow artifacts.
+- `scripts/post_pr_comment.py` can post the Markdown summary to a pull request when `GITHUB_TOKEN` and PR context are available.
+
+Policy behavior:
+
+- Exit code `0` when no confirmed High/Critical True Positive is found.
+- Exit code `0` when findings are only False Positive or Needs Review.
+- Exit code `1` when a confirmed High/Critical True Positive is found and `heimdall.yml` says to fail.
+- Exit code `2` for unsafe or invalid config.
+- Exit code `3` for runtime errors.
+
+Needs Review does not fail by default because it indicates missing context, authentication, multi-step state, or safety restrictions rather than confirmed exploitability.
+
+Safety defaults:
+
+- Dry-run is enabled.
+- Mock LLM is enabled.
+- Active DAST is limited to `security.allowed_targets`.
+- Production-looking domains are blocked unless explicitly enabled.
+- Destructive payload markers are rejected.
+- All DAST attempts are logged.
+
+See `docs/devsecops_integration.md` for the full CI/CD architecture and local vulnerable app instructions.
+
 ## Safety Warning
 
 Do not run dynamic validation against production systems unless explicit authorization and target allowlisting are configured. Heimdall V2 defaults to dry-run validation, local targets, non-destructive payloads, request logging, rate limiting, timeouts, and a kill switch.

@@ -1,0 +1,50 @@
+name: Heimdall DevSecOps Validation
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install semgrep
+
+      - name: Run Semgrep
+        run: |
+          semgrep scan --config auto --json --output semgrep-results.json || true
+
+      - name: Run Heimdall policy validation
+        run: |
+          python -m heimdall.cli validate --semgrep semgrep-results.json --config heimdall.yml --output reports/
+
+      - name: Post PR comment when available
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/post_pr_comment.py || true
+
+      - name: Upload Heimdall reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: heimdall-devsecops-reports
+          path: reports/
