@@ -216,9 +216,3 @@ Do not run dynamic validation against production systems unless explicit authori
 - Multi-step authenticated validation.
 - Larger benchmark datasets with independently reviewed labels.
 - Real LLM provider integration behind the structured output validator.
-
-## IEEE-Style Contribution Summary
-
-1. A closed-loop DevSecOps validation framework that integrates SAST, LLM-based exploitability reasoning, and DAST-based dynamic verification.
-2. An exploitability-oriented payload generation and validation workflow that converts static alerts into testable validation hypotheses.
-3. A reproducible evaluation workflow that compares Heimdall against SAST-only, rule-based, and LLM-only baselines using standard classification metrics.
