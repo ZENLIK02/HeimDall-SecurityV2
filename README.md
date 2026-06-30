@@ -10,7 +10,6 @@ Heimdall V2 provides two related interfaces: the Streamlit security lab applicat
 
 Current Streamlit application capabilities:
 
-- The Streamlit interface now follows the Base44 reference style: compact HD header, left control center, neutral cards, status pills, and finding summary tiles.
 - Safe ZIP extraction blocks path traversal and skips dependency folders such as `node_modules`, `.git`, and `__pycache__`.
 - SAST-only mode no longer requires an OpenAI API key.
 - Semgrep failures are shown clearly instead of silently producing empty results.
