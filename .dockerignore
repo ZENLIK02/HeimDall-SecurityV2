@@ -1,0 +1,10 @@
+.git
+.pytest_cache
+__pycache__
+*.pyc
+.venv
+venv
+reports/*
+!reports/demo_summary.md
+!reports/demo_ci_summary.md
+.streamlit/secrets.toml

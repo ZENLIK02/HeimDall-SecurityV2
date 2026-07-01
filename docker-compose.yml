@@ -1,0 +1,16 @@
+services:
+  heimdall-demo:
+    build: .
+    command:
+      - python
+      - -m
+      - heimdall.cli
+      - validate
+      - --semgrep
+      - test_data/semgrep-results-sample.json
+      - --config
+      - heimdall.yml
+      - --output
+      - reports/
+    volumes:
+      - ./reports:/app/reports

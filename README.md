@@ -1,14 +1,46 @@
-# Heimdall V2
+# Heimdall-SecurityV2
 
-Heimdall V2 is a research prototype for closed-loop security validation in a DevSecOps pipeline. It combines Static Application Security Testing (SAST), structured LLM-based exploitability reasoning, safe payload generation, dry-run Dynamic Application Security Testing (DAST), response analysis, and reproducible reporting.
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
+[![DevSecOps Validation](https://github.com/ZENLIK02/HeimDall-SecurityV2/actions/workflows/heimdall-devsecops.yml/badge.svg)](https://github.com/ZENLIK02/HeimDall-SecurityV2/actions/workflows/heimdall-devsecops.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-v0.1.0--alpha-orange)](CHANGELOG.md)
 
-The project is intended for authorized research, classroom, and local lab environments only. Dynamic validation defaults to dry-run behavior and local or explicitly allowlisted targets.
+Heimdall is **an open-source DevSecOps validation backend that reduces SAST false positives using LLM-assisted reasoning and safe DAST-style verification**.
 
-## Project Overview
+It is for AppSec engineers, DevSecOps teams, students, and researchers who want to test whether static findings can be converted into evidence-backed decisions: `True Positive`, `False Positive`, or `Needs Review`.
 
-Heimdall V2 provides two related interfaces: the Streamlit security lab application and a reproducible experiment runner for research evaluation. The experiment runner is the recommended interface for paper metrics because it produces stable CSV, JSON, and Markdown artifacts from a labeled dataset.
+Heimdall is an alpha-stage research/backend tool. It is not a production-ready enterprise platform, and it should only be tested on repositories and targets you own or are authorized to assess.
 
-Current Streamlit application capabilities:
+## 5-Minute Quickstart
+
+```bash
+git clone https://github.com/ZENLIK02/HeimDall-SecurityV2.git
+cd HeimDall-SecurityV2
+pip install -r requirements.txt
+python -m heimdall.cli experiment --dataset data/sample_alerts.jsonl --mode all --output reports/
+python -m heimdall.cli validate --semgrep test_data/semgrep-results-sample.json --config heimdall.yml --output reports/
+```
+
+Expected files:
+
+- `reports/summary.md`
+- `reports/summary.json`
+- `reports/results.csv`
+- `reports/ci_summary.md`
+
+## What Problem It Solves
+
+SAST tools are valuable because they scale across a codebase, but they often produce findings that need manual triage. Heimdall adds a validation layer that:
+
+- ingests Semgrep JSON,
+- extracts alert context,
+- uses structured LLM-style reasoning through a mock provider by default,
+- generates non-destructive validation hypotheses,
+- performs dry-run or allowlisted DAST-style validation,
+- explains the final decision,
+- produces CI/CD-friendly reports.
+
+## Streamlit Prototype Capabilities
 
 - Safe ZIP extraction blocks path traversal and skips dependency folders such as `node_modules`, `.git`, and `__pycache__`.
 - SAST-only mode no longer requires an OpenAI API key.
@@ -20,198 +52,178 @@ Current Streamlit application capabilities:
 - DAST target URLs are checked before live requests are sent.
 - AI verdicts are combined with simple HTTP-response heuristics for better accuracy.
 - AI JSON responses are handled safely so malformed model output does not crash the app.
-- AI prompts now apply prompt-injection guardrails by treating findings and HTTP evidence as untrusted data and truncating long fields before model review.
+- AI prompts apply prompt-injection guardrails by treating findings and HTTP evidence as untrusted data and truncating long fields before model review.
 - API keys are read from Streamlit input or `OPENAI_API_KEY`, not hardcoded in source files.
 
-## Problem Statement
-
-SAST tools are useful for broad code coverage, but they often produce false positives because static analysis cannot always observe runtime behavior, authentication state, framework sanitization, or application-specific controls. Heimdall V2 evaluates whether static alerts can be converted into safe validation hypotheses and then classified as True Positive, False Positive, or Needs Review.
-
-## Architecture
+## How It Works
 
 ```mermaid
 flowchart LR
-    A[SAST] --> B[Context Extraction]
+    A[Semgrep SAST JSON] --> B[Context Extraction]
     B --> C[Prompt Guard]
-    C --> D[LLM Reasoning]
-    D --> E[Payload Generation]
-    E --> F[DAST Executor]
+    C --> D[LLM-Assisted Reasoning]
+    D --> E[Safe Payload Generation]
+    E --> F[Dry-Run / Allowlisted DAST]
     F --> G[Response Analyzer]
     G --> H[Decision Engine]
-    H --> I[Report]
+    H --> I[Markdown / JSON / CSV Reports]
 ```
 
-The pipeline is modular:
+## Why It Is Safe To Test
 
-- `heimdall/evaluation/` contains dataset loading, baselines, metrics, and error analysis.
-- `heimdall/pipeline/` contains context extraction, prompt guarding, LLM output validation, payload generation, DAST safety controls, response analysis, and final decision logic.
-- `experiments/run_experiment.py` runs reproducible baseline comparisons and writes paper-ready reports.
+- Dry-run validation is enabled by default.
+- Mock LLM mode is enabled by default.
+- Active DAST is limited to configured `allowed_targets`.
+- Production-looking domains are blocked unless explicitly enabled.
+- Destructive payload markers are rejected.
+- All DAST attempts are logged.
+- `Needs Review` does not fail CI by default.
 
-## Installation
+## CLI Commands
+
+Check config safety:
 
 ```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
+python -m heimdall.cli check-config --config heimdall.yml
 ```
 
-For macOS or Linux:
+Run the research experiment:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+python -m heimdall.cli experiment --dataset data/sample_alerts.jsonl --mode all --output reports/
 ```
 
-## Streamlit Application
-
-The original Streamlit interface can be started with:
+Validate Semgrep output for CI/CD:
 
 ```bash
-streamlit run app.py
+python -m heimdall.cli validate --semgrep test_data/semgrep-results-sample.json --config heimdall.yml --output reports/
 ```
 
-The web interface supports ZIP upload, Semgrep execution, ranked findings, AI-assisted payload generation, and optional authorized validation.
+## GitHub Actions
 
-## Quickstart: Reproducible Experiment
+The workflow `.github/workflows/heimdall-devsecops.yml` runs on `push`, `pull_request`, and manual dispatch.
 
-Run all baseline modes against the included sample dataset:
+It:
 
-```bash
-python experiments/run_experiment.py --dataset data/sample_alerts.jsonl --mode all --output reports
-```
+- installs dependencies,
+- installs Semgrep,
+- runs Semgrep,
+- saves `semgrep-results.json`,
+- runs Heimdall validation,
+- uploads reports as artifacts,
+- optionally posts a pull request comment when GitHub context is available,
+- fails only according to Heimdall policy.
 
-Generated outputs:
+Policy exit codes:
+
+- `0`: no confirmed High/Critical True Positive found.
+- `0`: only False Positive or Needs Review findings exist.
+- `1`: confirmed High/Critical True Positive found and policy says to fail.
+- `2`: invalid or unsafe config.
+- `3`: runtime error.
+
+## Reports
+
+Research reports:
 
 - `reports/summary.md`
 - `reports/summary.json`
 - `reports/results.csv`
 - `reports/error_analysis.md`
 
-## How To Run Experiments
+CI/CD reports:
 
-Use the experiment runner with a JSONL dataset and an output directory:
+- `reports/ci_summary.md`
+- `reports/ci_results.json`
+- `reports/ci_results.csv`
 
-```bash
-python experiments/run_experiment.py --dataset data/sample_alerts.jsonl --mode all --output reports
-```
+Static demo examples are included:
 
-## How To Run Baseline Comparison
+- `reports/demo_summary.md`
+- `reports/demo_ci_summary.md`
 
-The `all` mode runs SAST-only, rule-based, LLM-only stub, and full Heimdall dry-run validation in one command:
+## Example Output
 
-```bash
-python experiments/run_experiment.py --dataset data/sample_alerts.jsonl --mode all --output reports
-```
+| Metric | Value |
+|---|---:|
+| Total Semgrep findings | 4 |
+| Confirmed True Positives | 0 |
+| False Positives | 3 |
+| Needs Review | 1 |
+| Pipeline status | PASSED |
+| Report path | `reports/ci_summary.md` |
 
-## Dataset Format
+Example finding table:
 
-The evaluation dataset uses JSON Lines. Each line represents one SAST alert:
+| Rule ID | Severity | File | Line | Heimdall Decision | Evidence | Recommended Action |
+|---|---|---|---:|---|---|---|
+| python.flask.security.xss.reflected-xss | high | `test_apps/flask_vulnerable_app/app.py` | 18 | False Positive | Controlled marker appears escaped or inert. | Document the defensive control or tune the SAST rule. |
+| python.flask.security.idor | low | `test_apps/flask_vulnerable_app/app.py` | 47 | Needs Review | Authentication context is required. | Review manually before active validation. |
 
-```json
-{
-  "alert_id": "A001",
-  "vulnerability_type": "SQL Injection",
-  "severity": "high",
-  "file_path": "app.py",
-  "line_number": 42,
-  "code_snippet": "query = 'SELECT * FROM users WHERE name=' + name",
-  "endpoint": "/login",
-  "method": "POST",
-  "parameters": {"name": "alice"},
-  "sast_message": "User input reaches SQL query construction.",
-  "ground_truth_label": "true_positive",
-  "notes": "Synthetic local-only evaluation alert."
-}
-```
+## Local Vulnerable Test App
 
-Valid labels are `true_positive` and `false_positive`.
-
-## Experiment Modes
-
-- `sast_only`: treats every SAST alert as real.
-- `rule_based_filtering`: uses deterministic rules for defensive controls and unsupported contexts.
-- `llm_only_stub`: simulates LLM reasoning without DAST validation.
-- `heimdall_full_pipeline_stub`: runs the safety-first closed-loop pipeline in dry-run mode.
-
-Run one mode:
+The local demo app is intentionally vulnerable and uses dummy data only:
 
 ```bash
-python experiments/run_experiment.py --dataset data/sample_alerts.jsonl --mode heimdall_full_pipeline_stub --output reports
+cd test_apps/flask_vulnerable_app
+python -m pip install flask
+python app.py
 ```
 
-## Interpreting Reports
-
-The reports include summary metrics, baseline comparison, confusion matrices, false-positive reduction rate, manual review rate, confirmed vulnerabilities, discarded false positives, Needs Review cases, decision evidence, explanations, error analysis, and safety log summary.
-
-Interpretation guidelines:
-
-- `True Positive`: the alert has supporting validation evidence.
-- `False Positive`: the alert was dismissed because exploitability was not supported by the available evidence.
-- `Needs Review`: validation needs authentication, multi-step state, stronger runtime evidence, or safety-policy approval.
-
-## CI/CD Demo
-
-The workflow `.github/workflows/heimdall.yml` installs dependencies, runs Semgrep when available, writes Semgrep JSON, executes Heimdall in dry-run mode with the sample dataset, uploads reports as artifacts, and fails only when the full pipeline confirms High or Critical True Positives.
-
-## DevSecOps Integration
-
-Heimdall V2 can run as a CI/CD validation backend for pull requests and pushes. The DevSecOps workflow consumes Semgrep JSON, converts findings into Heimdall alerts, runs the same safety-first validation pipeline, writes CI reports, and exits according to policy.
-
-Local commands:
+Then run Heimdall from the repository root:
 
 ```bash
-python -m heimdall.cli check-config --config heimdall.yml
 python -m heimdall.cli validate --semgrep test_data/semgrep-results-sample.json --config heimdall.yml --output reports/
-python -m heimdall.cli experiment --dataset data/sample_alerts.jsonl --mode all --output reports/
 ```
 
-GitHub Actions workflow:
+## Docker Demo
 
-- `.github/workflows/heimdall-devsecops.yml` runs on `push` and `pull_request`.
-- Semgrep writes `semgrep-results.json`.
-- Heimdall writes `reports/ci_summary.md`, `reports/ci_results.json`, and `reports/ci_results.csv`.
-- Reports are uploaded as workflow artifacts.
-- `scripts/post_pr_comment.py` can post the Markdown summary to a pull request when `GITHUB_TOKEN` and PR context are available.
+```bash
+docker build -t heimdall-security-v2 .
+docker run --rm -v "%cd%/reports:/app/reports" heimdall-security-v2
+```
 
-Policy behavior:
+On macOS/Linux:
 
-- Exit code `0` when no confirmed High/Critical True Positive is found.
-- Exit code `0` when findings are only False Positive or Needs Review.
-- Exit code `1` when a confirmed High/Critical True Positive is found and `heimdall.yml` says to fail.
-- Exit code `2` for unsafe or invalid config.
-- Exit code `3` for runtime errors.
+```bash
+docker run --rm -v "$PWD/reports:/app/reports" heimdall-security-v2
+```
 
-Needs Review does not fail by default because it indicates missing context, authentication, multi-step state, or safety restrictions rather than confirmed exploitability.
+Docker runs the sample validation command in dry-run mode.
 
-Safety defaults:
+## Current Limitations
 
-- Dry-run is enabled.
-- Mock LLM is enabled.
-- Active DAST is limited to `security.allowed_targets`.
-- Production-looking domains are blocked unless explicitly enabled.
-- Destructive payload markers are rejected.
-- All DAST attempts are logged.
+- Alpha-stage research backend.
+- Default validation is conservative and dry-run based.
+- Business logic flaws often need multi-step authenticated context.
+- Real LLM provider integration is intentionally behind schema validation.
+- The included datasets are small and synthetic.
+- External target validation requires careful allowlist configuration.
 
-See `docs/devsecops_integration.md` for the full CI/CD architecture and local vulnerable app instructions.
+## Roadmap
 
-## Safety Warning
+See `docs/roadmap.md` for the public roadmap.
 
-Do not run dynamic validation against production systems unless explicit authorization and target allowlisting are configured. Heimdall V2 defaults to dry-run validation, local targets, non-destructive payloads, request logging, rate limiting, timeouts, and a kill switch.
+Short version:
 
-## Limitations
+- `v0.1.0-alpha`: Semgrep ingestion, baseline comparison, dry-run validation, reports, GitHub Actions demo.
+- `v0.2.0`: PR comment bot, improved Semgrep compatibility, better response analyzer, local vulnerable app integration.
+- `v0.3.0`: authenticated testing support, OpenAPI endpoint mapping, RAG for multi-file context.
+- `v0.4.0`: GitLab CI support, Docker image, PyPI package.
 
-- The included dataset is small and synthetic.
-- Business logic flaws often require multi-step state and domain-specific workflows.
-- Missing authentication context can prevent reliable validation.
-- Prompt injection remains a risk when untrusted code comments or alert messages are sent to an LLM.
-- Model uncertainty requires conservative Needs Review decisions.
-- DAST safety restrictions intentionally limit live exploit validation.
+## Keywords
 
-## Future Work
+Suggested GitHub topics:
 
-- Retrieval-augmented generation for framework and project context.
-- Multi-language CI/CD support.
-- Multi-step authenticated validation.
-- Larger benchmark datasets with independently reviewed labels.
-- Real LLM provider integration behind the structured output validator.
+`devsecops`, `sast`, `dast`, `semgrep`, `application-security`, `appsec`, `cybersecurity`, `llm-security`, `security-automation`, `ci-cd`, `github-actions`, `false-positive-reduction`, `vulnerability-validation`
+
+## Contributing
+
+External testing feedback is welcome. Start with:
+
+- `CONTRIBUTING.md`
+- `SECURITY.md`
+- `docs/community_feedback.md`
+- `.github/ISSUE_TEMPLATE/devsecops_test_feedback.md`
+
+Please do not share real secrets, production target details, or private vulnerability data in public issues.
