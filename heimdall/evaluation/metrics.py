@@ -43,9 +43,21 @@ def calculate_metrics(results: Iterable[EvaluationResult]) -> dict[str, float | 
     recall = safe_divide(tp, tp + fn)
     f1 = safe_divide(2 * precision * recall, precision + recall)
 
+    decided = tp + fp + tn + fn
+    total_real = tp + fn + review_real
+    total_false = fp + tn + review_false
     total_false_positives = fp + tn
     false_positive_reduction_rate = safe_divide(tn, total_false_positives)
     manual_review_rate = safe_divide(review, total)
+    coverage = safe_divide(decided, total)
+    abstention_rate = safe_divide(review, total)
+    selective_precision = safe_divide(tp, tp + fp)
+    selective_recall = safe_divide(tp, total_real)
+    false_negative_risk = safe_divide(fn, total_real)
+    false_positive_pass_through_rate = safe_divide(fp, total_false)
+    review_burden_reduction = 1.0 - manual_review_rate
+    confirmed_true_positive_rate = safe_divide(tp, total_real)
+    utility_score = safe_divide(tp + tn - (2 * fp) - fn - (0.25 * review), total)
 
     return {
         "total": total,
@@ -62,4 +74,14 @@ def calculate_metrics(results: Iterable[EvaluationResult]) -> dict[str, float | 
         "f1_score": f1,
         "false_positive_reduction_rate": false_positive_reduction_rate,
         "manual_review_rate": manual_review_rate,
+        "coverage": coverage,
+        "decision_rate": coverage,
+        "abstention_rate": abstention_rate,
+        "selective_precision": selective_precision,
+        "selective_recall": selective_recall,
+        "false_negative_risk": false_negative_risk,
+        "false_positive_pass_through_rate": false_positive_pass_through_rate,
+        "review_burden_reduction": review_burden_reduction,
+        "confirmed_true_positive_rate": confirmed_true_positive_rate,
+        "utility_score": utility_score,
     }

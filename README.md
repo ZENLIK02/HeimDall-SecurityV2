@@ -11,6 +11,62 @@ It is for AppSec engineers, DevSecOps teams, students, and researchers who want 
 
 Heimdall is an alpha-stage research/backend tool. It is not a production-ready enterprise platform, and it should only be tested on repositories and targets you own or are authorized to assess.
 
+## Current Research Package Summary
+
+The current Heimdall V2 package includes a reproducible, localhost-only evaluation workflow for research and portfolio use. It is designed to show **safety-first selective validation**, not production exploit scanning.
+
+Final benchmark:
+
+- Total alerts: `480`
+- Synthetic SAST alerts: `300`
+- Active-local validation fixtures: `180`
+- Vulnerability categories: `12`
+- Ground-truth true positives: `292`
+- Ground-truth false positives: `188`
+- Active validation target: `http://127.0.0.1:5005`
+
+Main active-local result:
+
+| Metric | Value |
+|---|---:|
+| True Positives | 92 |
+| False Positives | 0 |
+| True Negatives | 44 |
+| False Negatives | 0 |
+| Needs Review | 344 |
+| Coverage | 0.2833 |
+| Abstention rate | 0.7167 |
+| Selective precision | 1.0000 |
+| Selective recall | 0.3151 |
+| Utility score | 0.1042 |
+
+Mode comparison:
+
+| Mode | Precision | Recall | F1 | Coverage | Manual Review |
+|---|---:|---:|---:|---:|---:|
+| SAST-only | 0.6083 | 1.0000 | 0.7565 | 1.0000 | 0.0000 |
+| Rule-based filtering | 0.8431 | 1.0000 | 0.9149 | 0.2125 | 0.7875 |
+| LLM-only stub | 0.8517 | 1.0000 | 0.9199 | 0.4437 | 0.5563 |
+| Heimdall full-pipeline stub | 0.0000 | 0.0000 | 0.0000 | 0.3333 | 0.6667 |
+| Heimdall dry-run mock | 0.0000 | 0.0000 | 0.0000 | 0.3333 | 0.6667 |
+| Heimdall active-local validation | 1.0000 | 1.0000 | 1.0000 | 0.2833 | 0.7167 |
+| GPT-4.1-mini ablation scaffold | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 1.0000 |
+
+Interpretation:
+
+- Active-local validation is highly precise on cases it decides, but intentionally abstains on many cases.
+- `Needs Review` is a safety feature for alerts that require authentication, role state, object ownership, multi-step workflows, unsupported runtime context, or non-local validation.
+- The GPT-4.1-mini ablation mode is scaffolded but skips by default unless explicitly enabled with API environment variables.
+- These results are controlled localhost evidence only. They do **not** prove production readiness or real-world exploit coverage.
+
+Run the final reproducibility workflow:
+
+```bash
+bash scripts/run_ieee_final_evaluation.sh
+```
+
+The latest full run passed `53` tests.
+
 ## 5-Minute Quickstart
 
 ```bash
@@ -19,6 +75,12 @@ cd HeimDall-SecurityV2
 pip install -r requirements.txt
 python -m heimdall.cli experiment --dataset data/sample_alerts.jsonl --mode all --output reports/
 python -m heimdall.cli validate --semgrep test_data/semgrep-results-sample.json --config heimdall.yml --output reports/
+```
+
+For the full IEEE-style local benchmark, use:
+
+```bash
+bash scripts/run_ieee_final_evaluation.sh
 ```
 
 Expected files:

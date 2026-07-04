@@ -22,6 +22,7 @@ class Alert:
     sast_message: str
     ground_truth_label: NormalizedLabel
     notes: str = ""
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def is_real_vulnerability(self) -> bool:

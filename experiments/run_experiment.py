@@ -269,6 +269,12 @@ def _safety_log_summary(rows: list[dict]) -> dict[str, int]:
             blocked_requests += 1
         if request_log and not row.get("metadata", {}).get("dry_run", True):
             live_requests += len(request_log)
+        active = row.get("metadata", {}).get("active_validation", {}) if isinstance(row.get("metadata"), dict) else {}
+        active_log = active.get("request_log", []) if isinstance(active, dict) else []
+        if active.get("status") == "blocked":
+            blocked_requests += 1
+        if active_log and not row.get("metadata", {}).get("dry_run", True):
+            live_requests += len(active_log)
     return {
         "dry_run_requests": dry_run_requests,
         "blocked_requests": blocked_requests,

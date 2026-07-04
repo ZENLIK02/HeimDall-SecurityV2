@@ -1,0 +1,41 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\title{Heimdall V2: Safety-First Selective Validation for Reducing SAST False Positives in DevSecOps Pipelines}
+\author{Anonymous Authors}
+\begin{document}
+\maketitle
+\begin{abstract}
+This paper evaluates Heimdall V2 on a reproducible 480-alert benchmark combining synthetic SAST findings with localhost-only active validation fixtures. The framework uses selective validation and intentional abstention to reduce unsupported true/false-positive claims.
+\end{abstract}
+\section{Introduction}
+Static Application Security Testing can produce high alert volume and false positives. Heimdall V2 investigates a safety-first selective validation workflow.
+\section{Threat Model and Safety Model}
+No public websites, production domains, public IPs, real secrets, destructive payloads, or third-party systems are used. Active validation is restricted to localhost fixtures.
+\section{Evaluation Methodology}
+The benchmark compares SAST-only, rule-based filtering, LLM-only stub, full-pipeline stub, dry-run mock, active-local validation, and optional GPT-4.1-mini ablation scaffolding.
+\section{Results}
+\begin{table}[h]
+\centering
+\caption{Main metrics by mode}
+\begin{tabular}{lrrrr}
+\toprule
+Mode & Precision & Recall & F1 & Review \\
+\midrule
+sast\_only & 0.6083 & 1.0000 & 0.7565 & 0.0000 \\
+rule\_based\_filtering & 0.8431 & 1.0000 & 0.9149 & 0.7875 \\
+llm\_only\_stub & 0.8517 & 1.0000 & 0.9199 & 0.5563 \\
+heimdall\_full\_pipeline\_stub & 0.0000 & 0.0000 & 0.0000 & 0.6667 \\
+heimdall\_dry\_run\_mock & 0.0000 & 0.0000 & 0.0000 & 0.6667 \\
+heimdall\_active\_local\_validation & 1.0000 & 1.0000 & 1.0000 & 0.7167 \\
+heimdall\_gpt41mini\_reasoning\_ablation & 0.0000 & 0.0000 & 0.0000 & 1.0000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\section{Discussion and Limitations}
+Results are controlled prototype evidence, not real-world exploit coverage. Needs Review represents intentional abstention for unsafe or unavailable runtime context.
+\section{Conclusion}
+Heimdall V2 shows that a safety-first selective validation workflow can report stronger precision on decided cases while honestly exposing coverage and abstention.
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+\end{document}

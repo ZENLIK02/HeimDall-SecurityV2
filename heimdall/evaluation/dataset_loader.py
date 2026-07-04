@@ -40,6 +40,11 @@ def normalize_label(value: Any) -> str:
 
 
 def _validate_row(row: dict[str, Any], line_number: int) -> Alert:
+    row = dict(row)
+    if "sast_message" not in row and "message" in row:
+        row["sast_message"] = row["message"]
+    if "endpoint" not in row and "endpoint_hint" in row:
+        row["endpoint"] = row["endpoint_hint"]
     missing = sorted(REQUIRED_FIELDS - set(row))
     if missing:
         raise DatasetValidationError(f"Line {line_number}: missing required fields: {', '.join(missing)}")
@@ -55,6 +60,8 @@ def _validate_row(row: dict[str, Any], line_number: int) -> Alert:
     except (TypeError, ValueError) as exc:
         raise DatasetValidationError(f"Line {line_number}: line_number must be an integer") from exc
 
+    metadata = {key: value for key, value in row.items() if key not in REQUIRED_FIELDS}
+
     return Alert(
         alert_id=str(row["alert_id"]),
         vulnerability_type=str(row["vulnerability_type"]),
@@ -68,6 +75,7 @@ def _validate_row(row: dict[str, Any], line_number: int) -> Alert:
         sast_message=str(row["sast_message"]),
         ground_truth_label=normalize_label(row["ground_truth_label"]),
         notes=str(row["notes"]),
+        metadata=metadata,
     )
 
 

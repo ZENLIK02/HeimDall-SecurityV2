@@ -1,0 +1,37 @@
+{
+  "seed": 42,
+  "total_alerts": 180,
+  "categories": {
+    "Broken Access Control": 15,
+    "Business Logic": 15,
+    "Command Injection": 15,
+    "Hardcoded Secret": 15,
+    "IDOR": 15,
+    "Insecure Deserialization": 15,
+    "Open Redirect": 15,
+    "Path Traversal": 15,
+    "Reflected XSS": 15,
+    "SQL Injection": 15,
+    "SSRF": 15,
+    "Weak Crypto": 15
+  },
+  "ground_truth_labels": {
+    "false_positive": 44,
+    "true_positive": 136
+  },
+  "severity": {
+    "critical": 51,
+    "high": 42,
+    "low": 40,
+    "medium": 47
+  },
+  "expected_validation_behavior": {
+    "confirmable_active_local": 92,
+    "dismissible_false_positive": 44,
+    "needs_review": 44
+  },
+  "source": {
+    "active_local_fixture": 180
+  },
+  "safety_scope": "All active validation targets are localhost / 127.0.0.1 lab fixtures."
+}

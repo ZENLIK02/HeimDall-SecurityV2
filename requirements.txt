@@ -1,3 +1,5 @@
 semgrep
 pytest
 flask
+Pillow
+reportlab

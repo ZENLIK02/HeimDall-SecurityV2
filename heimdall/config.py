@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -28,6 +28,15 @@ class DastRuntimeConfig:
 
 
 @dataclass(frozen=True)
+class ActiveValidationConfig:
+    enabled: bool = False
+    allowed_targets: tuple[str, ...] = ("http://127.0.0.1:5005", "http://localhost:5005")
+    allow_external_targets: bool = False
+    request_timeout_seconds: float = 2.0
+    max_requests_per_alert: int = 2
+
+
+@dataclass(frozen=True)
 class LLMConfig:
     provider: str = "mock"
     use_mock_llm: bool = True
@@ -50,6 +59,7 @@ class HeimdallConfig:
     llm: LLMConfig
     reports: ReportsConfig
     semgrep: SemgrepConfig
+    active_validation: ActiveValidationConfig = field(default_factory=ActiveValidationConfig)
 
 
 def load_config(path: str | Path) -> HeimdallConfig:
@@ -57,6 +67,9 @@ def load_config(path: str | Path) -> HeimdallConfig:
     config = HeimdallConfig(
         security=SecurityConfig(**_known(raw.get("security", {}), SecurityConfig)),
         dast=DastRuntimeConfig(**_known(raw.get("dast", {}), DastRuntimeConfig)),
+        active_validation=ActiveValidationConfig(
+            **_known(raw.get("active_validation", {}), ActiveValidationConfig)
+        ),
         llm=LLMConfig(**_known(raw.get("llm", {}), LLMConfig)),
         reports=ReportsConfig(**_known(raw.get("reports", {}), ReportsConfig)),
         semgrep=SemgrepConfig(**_known(raw.get("semgrep", {}), SemgrepConfig)),
@@ -72,6 +85,10 @@ def validate_config(config: HeimdallConfig) -> None:
         raise ConfigError("dast.max_requests_per_scan must be greater than zero")
     if config.dast.request_timeout_seconds <= 0:
         raise ConfigError("dast.request_timeout_seconds must be greater than zero")
+    if config.active_validation.request_timeout_seconds <= 0:
+        raise ConfigError("active_validation.request_timeout_seconds must be greater than zero")
+    if config.active_validation.max_requests_per_alert <= 0:
+        raise ConfigError("active_validation.max_requests_per_alert must be greater than zero")
     for target in config.security.allowed_targets:
         parsed = urlparse(target)
         if parsed.scheme not in {"http", "https"} or not parsed.netloc:
@@ -79,6 +96,13 @@ def validate_config(config: HeimdallConfig) -> None:
         host = parsed.hostname or ""
         if _production_like(host) and not config.security.allow_external_targets:
             raise ConfigError(f"external target {target} requires security.allow_external_targets: true")
+    for target in config.active_validation.allowed_targets:
+        parsed = urlparse(target)
+        if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+            raise ConfigError(f"invalid active validation target: {target}")
+        host = parsed.hostname or ""
+        if _production_like(host) and not config.active_validation.allow_external_targets:
+            raise ConfigError(f"active validation target {target} must be localhost unless explicitly enabled")
     blocked = set(config.security.blocked_targets)
     overlap = blocked.intersection(config.security.allowed_targets)
     if overlap:

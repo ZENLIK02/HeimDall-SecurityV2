@@ -13,6 +13,15 @@ dast:
   max_requests_per_scan: 50
   request_timeout_seconds: 5
 
+active_validation:
+  enabled: true
+  allowed_targets:
+    - "http://127.0.0.1:5005"
+    - "http://localhost:5005"
+  allow_external_targets: false
+  request_timeout_seconds: 2
+  max_requests_per_alert: 2
+
 llm:
   provider: "mock"
   use_mock_llm: true

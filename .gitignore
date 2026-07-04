@@ -2,6 +2,9 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+.heimdall_eval_venv/
 reports/*
 !reports/demo_summary.md
 !reports/demo_ci_summary.md
+paper/*.pdf
+test_data/heimdall_combined_360_alerts.jsonl

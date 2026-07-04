@@ -1,0 +1,34 @@
+{
+  "seed": 42,
+  "total_alerts": 300,
+  "categories": {
+    "Broken Access Control": 25,
+    "Business Logic": 25,
+    "Command Injection": 25,
+    "Hardcoded Secret": 25,
+    "IDOR": 25,
+    "Insecure Deserialization": 25,
+    "Open Redirect": 25,
+    "Path Traversal": 25,
+    "Reflected XSS": 25,
+    "SQL Injection": 25,
+    "SSRF": 25,
+    "Weak Crypto": 25
+  },
+  "ground_truth_labels": {
+    "false_positive": 144,
+    "true_positive": 156
+  },
+  "severity": {
+    "critical": 78,
+    "high": 76,
+    "low": 69,
+    "medium": 77
+  },
+  "expected_validation_behavior": {
+    "confirmable_in_live_local_test": 127,
+    "dismissible_false_positive": 122,
+    "needs_review": 51
+  },
+  "notes": "Synthetic local-only dataset. No production targets, real secrets, or destructive payloads are included."
+}

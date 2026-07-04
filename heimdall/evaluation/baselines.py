@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from .metrics import classify
 from .models import Alert, EvaluationResult
+from .active_local import run_active_local_validation
+from .llm_ablation import MODE as GPT41MINI_ABLATION_MODE
+from .llm_ablation import run_gpt41mini_reasoning_ablation
 from heimdall.pipeline.runner import run_validation_pipeline
 
 
@@ -10,6 +13,9 @@ SUPPORTED_MODES = (
     "rule_based_filtering",
     "llm_only_stub",
     "heimdall_full_pipeline_stub",
+    "heimdall_dry_run_mock",
+    "heimdall_active_local_validation",
+    GPT41MINI_ABLATION_MODE,
 )
 
 ERROR_CATEGORIES = {
@@ -123,6 +129,33 @@ def run_heimdall_full_pipeline_stub(alerts: list[Alert]) -> list[EvaluationResul
     return [run_validation_pipeline(alert) for alert in alerts]
 
 
+def run_heimdall_dry_run_mock(alerts: list[Alert]) -> list[EvaluationResult]:
+    results = [run_validation_pipeline(alert) for alert in alerts]
+    updated: list[EvaluationResult] = []
+    for result in results:
+        updated.append(
+            EvaluationResult(
+                alert_id=result.alert_id,
+                mode="heimdall_dry_run_mock",
+                vulnerability_type=result.vulnerability_type,
+                severity=result.severity,
+                ground_truth_label=result.ground_truth_label,
+                prediction=result.prediction,
+                classification=result.classification,
+                confidence=result.confidence,
+                error_category=result.error_category,
+                rationale=result.rationale,
+                final_decision=result.final_decision,
+                evidence=result.evidence,
+                explanation=result.explanation,
+                safety_notes=result.safety_notes,
+                recommended_action=result.recommended_action,
+                metadata=result.metadata,
+            )
+        )
+    return updated
+
+
 def run_mode(alerts: list[Alert], mode: str) -> list[EvaluationResult]:
     if mode == "sast_only":
         return run_sast_only(alerts)
@@ -132,4 +165,10 @@ def run_mode(alerts: list[Alert], mode: str) -> list[EvaluationResult]:
         return run_llm_only_stub(alerts)
     if mode == "heimdall_full_pipeline_stub":
         return run_heimdall_full_pipeline_stub(alerts)
+    if mode == "heimdall_dry_run_mock":
+        return run_heimdall_dry_run_mock(alerts)
+    if mode == "heimdall_active_local_validation":
+        return run_active_local_validation(alerts)
+    if mode == GPT41MINI_ABLATION_MODE:
+        return run_gpt41mini_reasoning_ablation(alerts)
     raise ValueError(f"Unsupported evaluation mode: {mode}")
