@@ -44,6 +44,20 @@ class ConfigTests(unittest.TestCase):
             with self.assertRaises(ConfigError):
                 load_config(path)
 
+    def test_bounded_dast_rejects_more_than_one_request_per_alert(self):
+        config_text = VALID_CONFIG + """
+active_validation:
+  enabled: true
+  allowed_targets:
+    - "http://127.0.0.1:5005"
+  max_requests_per_alert: 2
+"""
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "heimdall.yml"
+            path.write_text(config_text, encoding="utf-8")
+            with self.assertRaises(ConfigError):
+                load_config(path)
+
 
 if __name__ == "__main__":
     unittest.main()

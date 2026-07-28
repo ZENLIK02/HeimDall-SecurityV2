@@ -1,0 +1,8 @@
+mode,total,accuracy,precision,recall,f1_score,false_positive_reduction_rate,manual_review_rate,tp,fp,tn,fn,needs_review
+sast_only,480,0.6083,0.6083,1.0000,0.7565,0.0000,0.0000,292,188,0,0,0
+rule_based_filtering,480,0.1792,0.8431,1.0000,0.9149,0.0000,0.7875,86,16,0,0,378
+llm_only_stub,480,0.3792,0.8517,1.0000,0.9199,0.1143,0.5563,178,31,4,0,267
+heimdall_full_pipeline_stub,480,0.1333,0.0000,0.0000,0.0000,1.0000,0.6667,0,0,64,96,320
+heimdall_dry_run_mock,480,0.1333,0.0000,0.0000,0.0000,1.0000,0.6667,0,0,64,96,320
+heimdall_active_local_validation,480,0.2833,1.0000,1.0000,1.0000,1.0000,0.7167,92,0,44,0,344
+heimdall_gpt41mini_reasoning_ablation,480,0.0000,0.0000,0.0000,0.0000,0.0000,1.0000,0,0,0,0,480

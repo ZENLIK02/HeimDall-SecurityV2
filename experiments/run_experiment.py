@@ -112,7 +112,7 @@ def write_summary_markdown(path: Path, summary: dict) -> None:
 
     full_rows = summary["result_groups"].get("heimdall_full_pipeline_stub", {})
     lines.extend(_decision_section("Confirmed Vulnerabilities", full_rows.get("confirmed_vulnerabilities", [])))
-    lines.extend(_decision_section("Discarded False Positives", full_rows.get("discarded_false_positives", [])))
+    lines.extend(_decision_section("Not Reproduced Under Test", full_rows.get("not_reproduced", [])))
     lines.extend(_decision_section("Needs Review Cases", full_rows.get("needs_review_cases", [])))
 
     lines.extend(["## Safety Log Summary", ""])
@@ -233,10 +233,10 @@ def run_experiment(dataset: Path, output: Path, mode: str) -> dict:
 def _group_results(rows: list[dict]) -> dict[str, list[dict]]:
     return {
         "confirmed_vulnerabilities": [
-            row for row in rows if row["final_decision"] == "True Positive" and row["classification"] == "TP"
+            row for row in rows if row["prediction"] == "confirmed"
         ],
-        "discarded_false_positives": [
-            row for row in rows if row["final_decision"] == "False Positive" and row["classification"] == "TN"
+        "not_reproduced": [
+            row for row in rows if row["prediction"] == "dismissed"
         ],
         "needs_review_cases": [row for row in rows if row["final_decision"] == "Needs Review"],
     }

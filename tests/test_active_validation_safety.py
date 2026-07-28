@@ -10,6 +10,8 @@ class ActiveValidationSafetyTests(unittest.TestCase):
         self.assertTrue(is_local_url_allowed("http://localhost:5005/health", allowed))
         self.assertFalse(is_local_url_allowed("https://example.com/health", allowed))
         self.assertFalse(is_local_url_allowed("http://127.0.0.1:8000/health", allowed))
+        self.assertFalse(is_local_url_allowed("http://user:pass@127.0.0.1:5005/health", allowed))
+        self.assertFalse(is_local_url_allowed("http://127.0.0.1:5005/health#fragment", allowed))
         self.assertFalse(is_local_url_allowed("file:///etc/passwd", allowed))
 
 

@@ -1,0 +1,165 @@
+case_id,category,heimdall_category,cwe,ground_truth,run_1_prediction,run_1_classification,run_1_abstention_cause,run_1_request_count,run_1_status_code,run_1_elapsed_ms,run_2_prediction,run_2_classification,run_2_abstention_cause,run_2_request_count,run_2_status_code,run_2_elapsed_ms,counterfactual_classification
+BenchmarkTest00024,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,31.256600,needs_review,REVIEW,no declared negative predicate,1,500,26.725200,FN
+BenchmarkTest00025,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,136.553700,needs_review,REVIEW,no declared negative predicate,1,500,12.131400,FN
+BenchmarkTest00026,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,40.064300,needs_review,REVIEW,no declared negative predicate,1,500,13.953500,FN
+BenchmarkTest00027,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,17.722300,needs_review,REVIEW,no declared negative predicate,1,500,17.648300,FN
+BenchmarkTest00359,pathtraver,Path Traversal,22,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,93.212400,needs_review,REVIEW,no declared negative predicate,1,500,21.979900,FN
+BenchmarkTest00360,pathtraver,Path Traversal,22,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,29.478900,needs_review,REVIEW,no declared negative predicate,1,500,14.233900,FN
+BenchmarkTest00361,pathtraver,Path Traversal,22,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,14.576600,needs_review,REVIEW,no declared negative predicate,1,500,13.312300,TN
+BenchmarkTest00362,pathtraver,Path Traversal,22,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,15.288400,needs_review,REVIEW,no declared negative predicate,1,500,32.191100,FN
+BenchmarkTest00363,pathtraver,Path Traversal,22,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,16.453400,needs_review,REVIEW,no declared negative predicate,1,500,10.598400,FN
+BenchmarkTest00364,pathtraver,Path Traversal,22,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,15.372800,needs_review,REVIEW,no declared negative predicate,1,500,12.927800,TN
+BenchmarkTest00365,pathtraver,Path Traversal,22,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,28.032000,needs_review,REVIEW,no declared negative predicate,1,500,10.365900,TN
+BenchmarkTest00366,pathtraver,Path Traversal,22,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,13.001500,needs_review,REVIEW,no declared negative predicate,1,500,10.318900,TN
+BenchmarkTest00375,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,14.088400,confirmed,TP,,1,500,10.084300,TP
+BenchmarkTest00376,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,15.474000,confirmed,TP,,1,500,10.973400,TP
+BenchmarkTest00377,xss,Reflected XSS,79,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,15.648700,needs_review,REVIEW,no declared negative predicate,1,500,10.181500,TN
+BenchmarkTest00378,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,13.204200,confirmed,TP,,1,500,8.991900,TP
+BenchmarkTest00379,xss,Reflected XSS,79,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,20.404400,needs_review,REVIEW,no declared negative predicate,1,500,9.318400,TN
+BenchmarkTest00380,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,12.833000,confirmed,TP,,1,500,10.955000,TP
+BenchmarkTest00381,xss,Reflected XSS,79,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,12.918000,needs_review,REVIEW,no declared negative predicate,1,500,8.566500,TN
+BenchmarkTest00382,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,10.823500,confirmed,TP,,1,500,23.306000,TP
+BenchmarkTest00383,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,10.611900,confirmed,TP,,1,500,9.276400,TP
+BenchmarkTest00384,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,9.506600,confirmed,TP,,1,500,10.518900,TP
+BenchmarkTest00385,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,9.272600,confirmed,TP,,1,500,9.776600,TP
+BenchmarkTest00386,xss,Reflected XSS,79,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,11.819500,needs_review,REVIEW,no declared negative predicate,1,500,12.315000,TN
+BenchmarkTest00387,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,8.857600,confirmed,TP,,1,500,11.926600,TP
+BenchmarkTest00388,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,8.884700,confirmed,TP,,1,500,11.764400,TP
+BenchmarkTest00389,xss,Reflected XSS,79,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,20.157800,needs_review,REVIEW,no declared negative predicate,1,500,24.994600,TN
+BenchmarkTest00390,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,10.175800,confirmed,TP,,1,500,9.425500,TP
+BenchmarkTest00391,xss,Reflected XSS,79,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,9.375900,needs_review,REVIEW,no declared negative predicate,1,500,23.048600,TN
+BenchmarkTest00392,xss,Reflected XSS,79,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,34.383200,needs_review,REVIEW,no declared negative predicate,1,500,30.329600,FN
+BenchmarkTest00393,xss,Reflected XSS,79,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,11.079900,needs_review,REVIEW,no declared negative predicate,1,500,12.798200,TN
+BenchmarkTest00394,xss,Reflected XSS,79,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,7.687400,needs_review,REVIEW,no declared negative predicate,1,500,16.288600,TN
+BenchmarkTest00395,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,10.052800,confirmed,TP,,1,500,12.675500,TP
+BenchmarkTest00396,cmdi,Command Injection,78,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,56.306600,needs_review,REVIEW,no declared negative predicate,1,500,65.801800,TN
+BenchmarkTest00406,cmdi,Command Injection,78,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,59.933200,needs_review,REVIEW,no declared negative predicate,1,500,71.251500,TN
+BenchmarkTest00407,cmdi,Command Injection,78,true_positive,confirmed,TP,,1,500,38.974900,confirmed,TP,,1,500,48.689600,TP
+BenchmarkTest00408,cmdi,Command Injection,78,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,35.449600,needs_review,REVIEW,no declared negative predicate,1,500,46.513800,TN
+BenchmarkTest00409,cmdi,Command Injection,78,true_positive,confirmed,TP,,1,500,29.958500,confirmed,TP,,1,500,56.015800,TP
+BenchmarkTest00410,cmdi,Command Injection,78,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,1019.608600,needs_review,REVIEW,no declared negative predicate,1,500,1524.689700,TN
+BenchmarkTest00411,cmdi,Command Injection,78,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,976.695200,needs_review,REVIEW,no declared negative predicate,1,500,1204.993800,TN
+BenchmarkTest00412,cmdi,Command Injection,78,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,987.835800,needs_review,REVIEW,no declared negative predicate,1,500,1186.721500,TN
+BenchmarkTest00428,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,10.515800,needs_review,REVIEW,no declared negative predicate,1,500,9.670400,FN
+BenchmarkTest00429,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,9.970400,needs_review,REVIEW,no declared negative predicate,1,500,8.328700,FN
+BenchmarkTest00430,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,9.279700,needs_review,REVIEW,no declared negative predicate,1,500,7.196800,TN
+BenchmarkTest00431,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,11.697200,needs_review,REVIEW,no declared negative predicate,1,500,6.763100,FN
+BenchmarkTest00432,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,10.378600,needs_review,REVIEW,no declared negative predicate,1,500,9.407900,TN
+BenchmarkTest00433,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,11.458500,needs_review,REVIEW,no declared negative predicate,1,500,10.984200,FN
+BenchmarkTest00434,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,34.379600,needs_review,REVIEW,no declared negative predicate,1,500,35.892000,FN
+BenchmarkTest00435,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,27.636000,needs_review,REVIEW,no declared negative predicate,1,500,9.023700,FN
+BenchmarkTest00436,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,10.152500,needs_review,REVIEW,no declared negative predicate,1,500,8.296300,TN
+BenchmarkTest00437,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,7.808500,needs_review,REVIEW,no declared negative predicate,1,500,9.657700,TN
+BenchmarkTest00438,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,9.328100,needs_review,REVIEW,no declared negative predicate,1,500,10.354200,FN
+BenchmarkTest00439,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,8.165400,needs_review,REVIEW,no declared negative predicate,1,500,24.643600,FN
+BenchmarkTest00440,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,8.503600,needs_review,REVIEW,no declared negative predicate,1,500,8.606700,TN
+BenchmarkTest00441,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,8.388300,needs_review,REVIEW,no declared negative predicate,1,500,8.537900,FN
+BenchmarkTest01231,pathtraver,Path Traversal,22,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,9.150800,needs_review,REVIEW,no declared negative predicate,1,500,8.108700,FN
+BenchmarkTest01232,pathtraver,Path Traversal,22,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,11.051500,needs_review,REVIEW,no declared negative predicate,1,500,7.791100,FN
+BenchmarkTest01233,pathtraver,Path Traversal,22,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,11.295500,needs_review,REVIEW,no declared negative predicate,1,500,9.646800,TN
+BenchmarkTest01234,pathtraver,Path Traversal,22,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,10.331200,needs_review,REVIEW,no declared negative predicate,1,500,7.891300,FN
+BenchmarkTest01235,pathtraver,Path Traversal,22,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,30.356700,needs_review,REVIEW,no declared negative predicate,1,500,7.921800,FN
+BenchmarkTest01236,pathtraver,Path Traversal,22,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,9.735800,needs_review,REVIEW,no declared negative predicate,1,500,7.836400,FN
+BenchmarkTest01237,pathtraver,Path Traversal,22,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,20.844400,needs_review,REVIEW,no declared negative predicate,1,500,25.827900,TN
+BenchmarkTest01238,pathtraver,Path Traversal,22,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,10.037700,needs_review,REVIEW,no declared negative predicate,1,500,31.460100,FN
+BenchmarkTest01239,pathtraver,Path Traversal,22,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,9.254800,needs_review,REVIEW,no declared negative predicate,1,500,8.302600,TN
+BenchmarkTest01240,pathtraver,Path Traversal,22,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,9.580100,needs_review,REVIEW,no declared negative predicate,1,500,9.779800,TN
+BenchmarkTest01251,xss,Reflected XSS,79,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,9.179500,needs_review,REVIEW,no declared negative predicate,1,500,28.100200,TN
+BenchmarkTest01252,xss,Reflected XSS,79,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,9.118400,needs_review,REVIEW,no declared negative predicate,1,500,7.874600,TN
+BenchmarkTest01253,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,27.009100,confirmed,TP,,1,500,8.609200,TP
+BenchmarkTest01254,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,9.439300,confirmed,TP,,1,500,9.032200,TP
+BenchmarkTest01255,xss,Reflected XSS,79,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,8.890200,needs_review,REVIEW,no declared negative predicate,1,500,6.953400,TN
+BenchmarkTest01256,xss,Reflected XSS,79,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,29.173300,needs_review,REVIEW,no declared negative predicate,1,500,28.522700,TN
+BenchmarkTest01257,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,9.118900,confirmed,TP,,1,500,7.915500,TP
+BenchmarkTest01258,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,22.203100,confirmed,TP,,1,500,23.706400,TP
+BenchmarkTest01259,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,10.812600,confirmed,TP,,1,500,8.089600,TP
+BenchmarkTest01260,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,11.380500,confirmed,TP,,1,500,22.753200,TP
+BenchmarkTest01261,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,9.473500,confirmed,TP,,1,500,7.695600,TP
+BenchmarkTest01262,xss,Reflected XSS,79,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,10.949000,needs_review,REVIEW,no declared negative predicate,1,500,8.270500,FN
+BenchmarkTest01263,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,22.909600,confirmed,TP,,1,500,32.425100,TP
+BenchmarkTest01264,xss,Reflected XSS,79,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,9.847100,needs_review,REVIEW,no declared negative predicate,1,500,7.850400,TN
+BenchmarkTest01265,xss,Reflected XSS,79,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,8.948500,needs_review,REVIEW,no declared negative predicate,1,500,9.268000,TN
+BenchmarkTest01266,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,28.081800,confirmed,TP,,1,500,10.161900,TP
+BenchmarkTest01267,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,10.830700,confirmed,TP,,1,500,6.818600,TP
+BenchmarkTest01268,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,9.167700,confirmed,TP,,1,500,7.423700,TP
+BenchmarkTest01269,cmdi,Command Injection,78,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,42.732500,needs_review,REVIEW,no declared negative predicate,1,500,32.123000,TN
+BenchmarkTest01270,cmdi,Command Injection,78,true_positive,confirmed,TP,,1,500,41.816900,confirmed,TP,,1,500,33.069300,TP
+BenchmarkTest01284,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,9.834700,confirmed,TP,,1,500,9.274600,TP
+BenchmarkTest01285,cmdi,Command Injection,78,true_positive,confirmed,TP,,1,500,37.368500,confirmed,TP,,1,500,32.293300,TP
+BenchmarkTest01286,cmdi,Command Injection,78,true_positive,confirmed,TP,,1,500,77.055300,confirmed,TP,,1,500,52.024700,TP
+BenchmarkTest01287,cmdi,Command Injection,78,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,968.071400,needs_review,REVIEW,no declared negative predicate,1,500,1317.215000,FN
+BenchmarkTest01288,cmdi,Command Injection,78,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,1059.302400,needs_review,REVIEW,no declared negative predicate,1,500,1289.956100,FN
+BenchmarkTest01289,cmdi,Command Injection,78,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,40.220000,needs_review,REVIEW,no declared negative predicate,1,500,45.160300,TN
+BenchmarkTest01290,cmdi,Command Injection,78,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,1452.052700,needs_review,REVIEW,no declared negative predicate,1,500,1311.277100,TN
+BenchmarkTest01301,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,22.152000,needs_review,REVIEW,no declared negative predicate,1,500,9.249800,TN
+BenchmarkTest01302,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,25.114200,needs_review,REVIEW,no declared negative predicate,1,500,9.674000,FN
+BenchmarkTest01303,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,20.650700,needs_review,REVIEW,no declared negative predicate,1,500,31.457500,TN
+BenchmarkTest01304,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,19.183700,needs_review,REVIEW,no declared negative predicate,1,500,9.877100,FN
+BenchmarkTest01305,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,21.060300,needs_review,REVIEW,no declared negative predicate,1,500,10.206500,TN
+BenchmarkTest01306,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,38.576900,needs_review,REVIEW,no declared negative predicate,1,500,9.305900,FN
+BenchmarkTest01307,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,23.888600,needs_review,REVIEW,no declared negative predicate,1,500,32.644900,TN
+BenchmarkTest01308,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,27.668700,needs_review,REVIEW,no declared negative predicate,1,500,8.564700,FN
+BenchmarkTest01309,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,42.980900,needs_review,REVIEW,no declared negative predicate,1,500,8.794500,TN
+BenchmarkTest01310,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,27.321500,needs_review,REVIEW,no declared negative predicate,1,500,9.349500,TN
+BenchmarkTest01311,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,19.223500,needs_review,REVIEW,no declared negative predicate,1,500,9.753000,FN
+BenchmarkTest01312,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,21.333000,needs_review,REVIEW,no declared negative predicate,1,500,10.828700,FN
+BenchmarkTest01313,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,20.443200,needs_review,REVIEW,no declared negative predicate,1,500,34.040000,FN
+BenchmarkTest01314,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,18.078000,needs_review,REVIEW,no declared negative predicate,1,500,10.695700,FN
+BenchmarkTest01315,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,15.494100,needs_review,REVIEW,no declared negative predicate,1,500,12.460600,TN
+BenchmarkTest02105,pathtraver,Path Traversal,22,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,14.207500,needs_review,REVIEW,no declared negative predicate,1,500,10.047800,FN
+BenchmarkTest02106,pathtraver,Path Traversal,22,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,18.062900,needs_review,REVIEW,no declared negative predicate,1,500,12.243000,FN
+BenchmarkTest02107,pathtraver,Path Traversal,22,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,23.062800,needs_review,REVIEW,no declared negative predicate,1,500,10.042500,TN
+BenchmarkTest02108,pathtraver,Path Traversal,22,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,14.097000,needs_review,REVIEW,no declared negative predicate,1,500,10.947900,TN
+BenchmarkTest02109,pathtraver,Path Traversal,22,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,18.353200,needs_review,REVIEW,no declared negative predicate,1,500,11.171700,FN
+BenchmarkTest02110,pathtraver,Path Traversal,22,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,14.873500,needs_review,REVIEW,no declared negative predicate,1,500,12.794600,TN
+BenchmarkTest02111,pathtraver,Path Traversal,22,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,13.175600,needs_review,REVIEW,no declared negative predicate,1,500,11.361400,TN
+BenchmarkTest02112,pathtraver,Path Traversal,22,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,13.817900,needs_review,REVIEW,no declared negative predicate,1,500,12.481400,FN
+BenchmarkTest02113,pathtraver,Path Traversal,22,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,15.220600,needs_review,REVIEW,no declared negative predicate,1,500,10.735400,FN
+BenchmarkTest02122,xss,Reflected XSS,79,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,14.278700,needs_review,REVIEW,no declared negative predicate,1,500,12.072700,TN
+BenchmarkTest02123,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,13.703300,confirmed,TP,,1,500,11.059800,TP
+BenchmarkTest02124,xss,Reflected XSS,79,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,13.256700,needs_review,REVIEW,no declared negative predicate,1,500,10.283500,FN
+BenchmarkTest02125,xss,Reflected XSS,79,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,12.328700,needs_review,REVIEW,no declared negative predicate,1,500,9.681400,TN
+BenchmarkTest02126,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,13.010100,confirmed,TP,,1,500,10.485600,TP
+BenchmarkTest02127,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,13.874700,confirmed,TP,,1,500,9.419400,TP
+BenchmarkTest02128,xss,Reflected XSS,79,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,14.727200,needs_review,REVIEW,no declared negative predicate,1,500,9.485300,FN
+BenchmarkTest02129,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,15.287600,confirmed,TP,,1,500,8.332700,TP
+BenchmarkTest02130,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,11.825100,confirmed,TP,,1,500,8.633300,TP
+BenchmarkTest02131,xss,Reflected XSS,79,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,17.586600,needs_review,REVIEW,no declared negative predicate,1,500,8.858100,FN
+BenchmarkTest02132,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,14.487500,confirmed,TP,,1,500,9.179600,TP
+BenchmarkTest02133,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,13.232200,confirmed,TP,,1,500,9.095800,TP
+BenchmarkTest02134,xss,Reflected XSS,79,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,12.385300,needs_review,REVIEW,no declared negative predicate,1,500,18.471600,FN
+BenchmarkTest02135,xss,Reflected XSS,79,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,16.751700,needs_review,REVIEW,no declared negative predicate,1,500,11.098400,TN
+BenchmarkTest02136,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,19.869800,confirmed,TP,,1,500,7.846800,TP
+BenchmarkTest02137,cmdi,Command Injection,78,true_positive,confirmed,TP,,1,500,81.820000,confirmed,TP,,1,500,35.647200,TP
+BenchmarkTest02145,xss,Reflected XSS,79,true_positive,confirmed,TP,,1,500,11.023500,confirmed,TP,,1,500,10.211200,TP
+BenchmarkTest02146,cmdi,Command Injection,78,true_positive,confirmed,TP,,1,500,44.129200,confirmed,TP,,1,500,37.784900,TP
+BenchmarkTest02147,cmdi,Command Injection,78,true_positive,confirmed,TP,,1,500,34.087900,confirmed,TP,,1,500,55.023300,TP
+BenchmarkTest02148,cmdi,Command Injection,78,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,66.412800,needs_review,REVIEW,no declared negative predicate,1,500,56.324500,TN
+BenchmarkTest02149,cmdi,Command Injection,78,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,53.689700,needs_review,REVIEW,no declared negative predicate,1,500,33.720600,TN
+BenchmarkTest02150,cmdi,Command Injection,78,true_positive,confirmed,TP,,1,500,38.914000,confirmed,TP,,1,500,34.335800,TP
+BenchmarkTest02151,cmdi,Command Injection,78,true_positive,confirmed,TP,,1,500,27.815100,confirmed,TP,,1,500,32.871500,TP
+BenchmarkTest02152,cmdi,Command Injection,78,true_positive,confirmed,TP,,1,500,28.288200,confirmed,TP,,1,500,34.363200,TP
+BenchmarkTest02153,cmdi,Command Injection,78,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,2562.374200,needs_review,REVIEW,no declared negative predicate,1,500,1349.189000,TN
+BenchmarkTest02154,cmdi,Command Injection,78,true_positive,confirmed,TP,,1,500,44.225700,confirmed,TP,,1,500,34.662200,TP
+BenchmarkTest02155,cmdi,Command Injection,78,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,1298.726100,needs_review,REVIEW,no declared negative predicate,1,500,1384.883700,FN
+BenchmarkTest02156,cmdi,Command Injection,78,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,1485.406800,needs_review,REVIEW,no declared negative predicate,1,500,1233.146300,TN
+BenchmarkTest02169,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,25.340600,needs_review,REVIEW,no declared negative predicate,1,500,9.730800,FN
+BenchmarkTest02170,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,21.938200,needs_review,REVIEW,no declared negative predicate,1,500,8.433200,FN
+BenchmarkTest02171,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,21.481400,needs_review,REVIEW,no declared negative predicate,1,500,7.805800,FN
+BenchmarkTest02172,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,21.847900,needs_review,REVIEW,no declared negative predicate,1,500,7.661900,TN
+BenchmarkTest02173,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,20.028900,needs_review,REVIEW,no declared negative predicate,1,500,7.752700,TN
+BenchmarkTest02174,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,27.701000,needs_review,REVIEW,no declared negative predicate,1,500,7.645600,TN
+BenchmarkTest02175,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,211.831500,needs_review,REVIEW,no declared negative predicate,1,500,20.285300,TN
+BenchmarkTest02176,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,11.745700,needs_review,REVIEW,no declared negative predicate,1,500,7.289100,TN
+BenchmarkTest02177,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,14.817300,needs_review,REVIEW,no declared negative predicate,1,500,8.046000,FN
+BenchmarkTest02178,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,13.028700,needs_review,REVIEW,no declared negative predicate,1,500,7.517600,FN
+BenchmarkTest02179,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,12.582500,needs_review,REVIEW,no declared negative predicate,1,500,25.635900,FN
+BenchmarkTest02180,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,11.906000,needs_review,REVIEW,no declared negative predicate,1,500,8.945300,TN
+BenchmarkTest02181,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,11.423900,needs_review,REVIEW,no declared negative predicate,1,500,8.807000,FN
+BenchmarkTest02182,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,10.733800,needs_review,REVIEW,no declared negative predicate,1,500,8.143100,FN
+BenchmarkTest02183,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,10.343600,needs_review,REVIEW,no declared negative predicate,1,500,8.169700,TN
+BenchmarkTest02184,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,10.767800,needs_review,REVIEW,no declared negative predicate,1,500,9.204800,TN
+BenchmarkTest02185,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,13.294000,needs_review,REVIEW,no declared negative predicate,1,500,9.382500,TN
+BenchmarkTest02186,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,11.530000,needs_review,REVIEW,no declared negative predicate,1,500,9.980000,FN
+BenchmarkTest02187,sqli,SQL Injection,89,true_positive,needs_review,REVIEW,no declared negative predicate,1,500,10.114500,needs_review,REVIEW,no declared negative predicate,1,500,8.548100,FN
+BenchmarkTest02188,sqli,SQL Injection,89,false_positive,needs_review,REVIEW,no declared negative predicate,1,500,16.701300,needs_review,REVIEW,no declared negative predicate,1,500,8.601300,TN

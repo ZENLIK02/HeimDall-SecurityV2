@@ -1,0 +1,10 @@
+[INFO] BuildTimeEventSpy is registered.
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------------< org.owasp:benchmark >-------------------------
+[INFO] Building OWASP Benchmark for Java 1.2
+[INFO]   from pom.xml
+[INFO] --------------------------------[ war ]---------------------------------
+[INFO] 
+[INFO] --- cargo:1.10.28:run (default-cli) @ benchmark ---
+[INFO] Press Ctrl-C to stop the container...

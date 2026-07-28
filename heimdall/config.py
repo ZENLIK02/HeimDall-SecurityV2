@@ -33,7 +33,8 @@ class ActiveValidationConfig:
     allowed_targets: tuple[str, ...] = ("http://127.0.0.1:5005", "http://localhost:5005")
     allow_external_targets: bool = False
     request_timeout_seconds: float = 2.0
-    max_requests_per_alert: int = 2
+    max_requests_per_alert: int = 1
+    response_body_limit_bytes: int = 65536
 
 
 @dataclass(frozen=True)
@@ -87,8 +88,10 @@ def validate_config(config: HeimdallConfig) -> None:
         raise ConfigError("dast.request_timeout_seconds must be greater than zero")
     if config.active_validation.request_timeout_seconds <= 0:
         raise ConfigError("active_validation.request_timeout_seconds must be greater than zero")
-    if config.active_validation.max_requests_per_alert <= 0:
-        raise ConfigError("active_validation.max_requests_per_alert must be greater than zero")
+    if config.active_validation.max_requests_per_alert != 1:
+        raise ConfigError("active_validation.max_requests_per_alert must be exactly one for the bounded DAST protocol")
+    if config.active_validation.response_body_limit_bytes <= 0:
+        raise ConfigError("active_validation.response_body_limit_bytes must be greater than zero")
     for target in config.security.allowed_targets:
         parsed = urlparse(target)
         if parsed.scheme not in {"http", "https"} or not parsed.netloc:

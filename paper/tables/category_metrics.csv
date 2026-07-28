@@ -1,0 +1,85 @@
+mode,vulnerability_type,category_coverage,category_abstention_rate,category_TP,category_FP,category_TN,category_FN,category_NeedsReview,category_selective_precision,category_selective_recall
+heimdall_active_local_validation,Broken Access Control,0.2250,0.7750,6,0,3,0,31,1.0000,1.0000
+heimdall_active_local_validation,Business Logic,0.2000,0.8000,5,0,3,0,32,1.0000,1.0000
+heimdall_active_local_validation,Command Injection,0.3250,0.6750,9,0,4,0,27,1.0000,1.0000
+heimdall_active_local_validation,Hardcoded Secret,0.3250,0.6750,9,0,4,0,27,1.0000,1.0000
+heimdall_active_local_validation,IDOR,0.2250,0.7750,6,0,3,0,31,1.0000,1.0000
+heimdall_active_local_validation,Insecure Deserialization,0.2000,0.8000,5,0,3,0,32,1.0000,1.0000
+heimdall_active_local_validation,Open Redirect,0.3250,0.6750,9,0,4,0,27,1.0000,1.0000
+heimdall_active_local_validation,Path Traversal,0.3250,0.6750,9,0,4,0,27,1.0000,1.0000
+heimdall_active_local_validation,Reflected XSS,0.3250,0.6750,9,0,4,0,27,1.0000,1.0000
+heimdall_active_local_validation,SQL Injection,0.3250,0.6750,9,0,4,0,27,1.0000,1.0000
+heimdall_active_local_validation,SSRF,0.2750,0.7250,7,0,4,0,29,1.0000,1.0000
+heimdall_active_local_validation,Weak Crypto,0.3250,0.6750,9,0,4,0,27,1.0000,1.0000
+heimdall_dry_run_mock,Broken Access Control,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_dry_run_mock,Business Logic,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_dry_run_mock,Command Injection,1.0000,0.0000,0,0,16,24,0,0.0000,0.0000
+heimdall_dry_run_mock,Hardcoded Secret,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_dry_run_mock,IDOR,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_dry_run_mock,Insecure Deserialization,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_dry_run_mock,Open Redirect,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_dry_run_mock,Path Traversal,1.0000,0.0000,0,0,16,24,0,0.0000,0.0000
+heimdall_dry_run_mock,Reflected XSS,1.0000,0.0000,0,0,16,24,0,0.0000,0.0000
+heimdall_dry_run_mock,SQL Injection,1.0000,0.0000,0,0,16,24,0,0.0000,0.0000
+heimdall_dry_run_mock,SSRF,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_dry_run_mock,Weak Crypto,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_full_pipeline_stub,Broken Access Control,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_full_pipeline_stub,Business Logic,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_full_pipeline_stub,Command Injection,1.0000,0.0000,0,0,16,24,0,0.0000,0.0000
+heimdall_full_pipeline_stub,Hardcoded Secret,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_full_pipeline_stub,IDOR,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_full_pipeline_stub,Insecure Deserialization,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_full_pipeline_stub,Open Redirect,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_full_pipeline_stub,Path Traversal,1.0000,0.0000,0,0,16,24,0,0.0000,0.0000
+heimdall_full_pipeline_stub,Reflected XSS,1.0000,0.0000,0,0,16,24,0,0.0000,0.0000
+heimdall_full_pipeline_stub,SQL Injection,1.0000,0.0000,0,0,16,24,0,0.0000,0.0000
+heimdall_full_pipeline_stub,SSRF,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_full_pipeline_stub,Weak Crypto,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_gpt41mini_reasoning_ablation,Broken Access Control,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_gpt41mini_reasoning_ablation,Business Logic,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_gpt41mini_reasoning_ablation,Command Injection,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_gpt41mini_reasoning_ablation,Hardcoded Secret,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_gpt41mini_reasoning_ablation,IDOR,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_gpt41mini_reasoning_ablation,Insecure Deserialization,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_gpt41mini_reasoning_ablation,Open Redirect,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_gpt41mini_reasoning_ablation,Path Traversal,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_gpt41mini_reasoning_ablation,Reflected XSS,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_gpt41mini_reasoning_ablation,SQL Injection,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_gpt41mini_reasoning_ablation,SSRF,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+heimdall_gpt41mini_reasoning_ablation,Weak Crypto,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+llm_only_stub,Broken Access Control,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+llm_only_stub,Business Logic,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+llm_only_stub,Command Injection,0.6500,0.3500,22,4,0,0,14,0.8462,1.0000
+llm_only_stub,Hardcoded Secret,0.5750,0.4250,19,4,0,0,17,0.8261,1.0000
+llm_only_stub,IDOR,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+llm_only_stub,Insecure Deserialization,0.4000,0.6000,13,3,0,0,24,0.8125,1.0000
+llm_only_stub,Open Redirect,0.5750,0.4250,19,4,0,0,17,0.8261,1.0000
+llm_only_stub,Path Traversal,0.6500,0.3500,22,4,0,0,14,0.8462,1.0000
+llm_only_stub,Reflected XSS,0.6500,0.3500,22,0,4,0,14,1.0000,1.0000
+llm_only_stub,SQL Injection,0.6500,0.3500,22,4,0,0,14,0.8462,1.0000
+llm_only_stub,SSRF,0.6000,0.4000,20,4,0,0,16,0.8333,1.0000
+llm_only_stub,Weak Crypto,0.5750,0.4250,19,4,0,0,17,0.8261,1.0000
+rule_based_filtering,Broken Access Control,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+rule_based_filtering,Business Logic,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+rule_based_filtering,Command Injection,0.6500,0.3500,22,4,0,0,14,0.8462,1.0000
+rule_based_filtering,Hardcoded Secret,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+rule_based_filtering,IDOR,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+rule_based_filtering,Insecure Deserialization,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+rule_based_filtering,Open Redirect,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+rule_based_filtering,Path Traversal,0.6500,0.3500,22,4,0,0,14,0.8462,1.0000
+rule_based_filtering,Reflected XSS,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+rule_based_filtering,SQL Injection,0.6500,0.3500,22,4,0,0,14,0.8462,1.0000
+rule_based_filtering,SSRF,0.6000,0.4000,20,4,0,0,16,0.8333,1.0000
+rule_based_filtering,Weak Crypto,0.0000,1.0000,0,0,0,0,40,0.0000,0.0000
+sast_only,Broken Access Control,1.0000,0.0000,25,15,0,0,0,0.6250,1.0000
+sast_only,Business Logic,1.0000,0.0000,25,15,0,0,0,0.6250,1.0000
+sast_only,Command Injection,1.0000,0.0000,24,16,0,0,0,0.6000,1.0000
+sast_only,Hardcoded Secret,1.0000,0.0000,24,16,0,0,0,0.6000,1.0000
+sast_only,IDOR,1.0000,0.0000,25,15,0,0,0,0.6250,1.0000
+sast_only,Insecure Deserialization,1.0000,0.0000,25,15,0,0,0,0.6250,1.0000
+sast_only,Open Redirect,1.0000,0.0000,24,16,0,0,0,0.6000,1.0000
+sast_only,Path Traversal,1.0000,0.0000,24,16,0,0,0,0.6000,1.0000
+sast_only,Reflected XSS,1.0000,0.0000,24,16,0,0,0,0.6000,1.0000
+sast_only,SQL Injection,1.0000,0.0000,24,16,0,0,0,0.6000,1.0000
+sast_only,SSRF,1.0000,0.0000,24,16,0,0,0,0.6000,1.0000
+sast_only,Weak Crypto,1.0000,0.0000,24,16,0,0,0,0.6000,1.0000

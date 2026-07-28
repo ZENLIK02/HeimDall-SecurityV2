@@ -1,6 +1,8 @@
 # Heimdall DevSecOps Integration
 
-Heimdall V2 can run as a CI/CD security validation backend. In this mode, Semgrep produces static findings, Heimdall converts those findings into alert objects, the validation pipeline classifies each alert, and the CLI returns a policy-based exit code.
+Heimdall V2 includes a deterministic bounded DAST path and a legacy dry-run CI
+adapter. The bounded DAST path requires an explicit alert-to-runtime manifest;
+raw Semgrep output alone does not authorize network execution.
 
 ## CI/CD Workflow
 
@@ -10,27 +12,33 @@ flowchart TD
     B --> C[Semgrep scans code]
     C --> D[Semgrep JSON saved]
     D --> E[Heimdall validates findings]
-    E --> F[Heimdall classifies TP / FP / Needs Review]
+    E --> F[Confirmed / Not Reproduced / Needs Review]
     F --> G[Report uploaded]
     G --> H[Pipeline passes or fails based on policy]
 ```
 
 ## GitHub Actions Flow
 
-The workflow `.github/workflows/heimdall-devsecops.yml` installs Python dependencies, installs Semgrep, writes `semgrep-results.json`, runs `python -m heimdall.cli validate`, uploads reports, and optionally posts `reports/ci_summary.md` to pull requests.
+The existing workflow `.github/workflows/heimdall-devsecops.yml` runs the legacy
+dry-run `validate` command. It is retained as a compatibility example and is not
+the bounded DAST evaluation path.
 
 ## Semgrep-To-Heimdall Data Flow
 
 1. Semgrep writes JSON results.
 2. `heimdall.semgrep_ingest` preserves rule ID, severity, file path, line number, message, snippet, and CWE metadata where available.
 3. Findings are converted into Heimdall `Alert` objects.
-4. The existing prompt guard, mock LLM provider, payload generator, DAST executor, response analyzer, and decision engine run in dry-run mode by default.
-5. CI reports are written to `reports/`.
+4. A separately reviewed manifest adds the relative endpoint, fixed GET/POST
+   parameters, exact loopback target, and evidence predicates.
+5. `python -m heimdall.cli bounded-dast` performs the safety preflight and sends
+   at most one request per executable alert.
+6. JSON, CSV, and Markdown audit reports are written to the selected output
+   directory.
 
 ## Policy Decision Logic
 
 - Exit code `0`: no confirmed High/Critical True Positive was found.
-- Exit code `0`: only False Positive or Needs Review findings exist.
+- Exit code `0`: only Not Reproduced Under Test or Needs Review findings exist.
 - Exit code `1`: confirmed High/Critical True Positive exists and policy says to fail.
 - Exit code `2`: config is invalid or unsafe.
 - Exit code `3`: runtime error.
@@ -39,12 +47,13 @@ Needs Review does not fail the pipeline by default because it means the system l
 
 ## Safety Model
 
-- Dry-run is enabled by default.
-- Mock LLM is enabled by default.
-- DAST refuses targets not present in `security.allowed_targets`.
-- Production-looking domains are rejected unless `security.allow_external_targets` is explicitly enabled.
-- Blocked targets cannot also be allowlisted.
-- Every DAST attempt is logged.
+- Bounded DAST is disabled unless configured explicitly.
+- The bounded path uses no LLM.
+- Only exact loopback origins in `active_validation.allowed_targets` are accepted.
+- Exactly one GET or POST is allowed per executable alert.
+- Redirects are never followed and captured responses are size-limited.
+- Missing evidence, runtime context, or authorization returns Needs Review.
+- Every sent or blocked attempt is logged.
 - The kill switch stops DAST immediately.
 
 ## Local Integration Test
@@ -52,23 +61,24 @@ Needs Review does not fail the pipeline by default because it means the system l
 Start the local test app:
 
 ```bash
-cd test_apps/flask_vulnerable_app
-python -m pip install flask
-python app.py
+python scripts/run_bounded_dast_controlled.py
 ```
 
-Run Heimdall with the sample Semgrep output:
+Or start the included local lab and run the bounded DAST command directly:
 
 ```bash
 python -m heimdall.cli check-config --config heimdall.yml
-python -m heimdall.cli validate --semgrep test_data/semgrep-results-sample.json --config heimdall.yml --output reports/
+python -m heimdall.cli bounded-dast \
+  --dataset test_data/heimdall_active_local_alerts.jsonl \
+  --config heimdall.yml \
+  --output reports/bounded_dast
 ```
 
-Read `reports/ci_summary.md` for the CI-friendly result.
+Read `reports/bounded_dast/summary.md` and `results.json`.
 
 ## Limitations
 
-- The default validation path is conservative and dry-run based.
+- SAST alerts require a separately reviewed runtime mapping before execution.
 - Authenticated and multi-step workflows require additional context.
-- Real LLM providers should remain behind the structured output validator.
-- Production deployment requires audited target allowlists, secret management, and review of policy thresholds.
+- The bounded protocol rejects production and other non-loopback targets.
+- Not Reproduced Under Test is not proof that an alert is a false positive.

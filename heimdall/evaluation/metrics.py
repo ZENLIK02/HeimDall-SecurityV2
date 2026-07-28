@@ -50,6 +50,7 @@ def calculate_metrics(results: Iterable[EvaluationResult]) -> dict[str, float | 
     false_positive_reduction_rate = safe_divide(tn, total_false_positives)
     manual_review_rate = safe_divide(review, total)
     coverage = safe_divide(decided, total)
+    decided_accuracy = safe_divide(tp + tn, decided)
     abstention_rate = safe_divide(review, total)
     selective_precision = safe_divide(tp, tp + fp)
     selective_recall = safe_divide(tp, total_real)
@@ -75,6 +76,7 @@ def calculate_metrics(results: Iterable[EvaluationResult]) -> dict[str, float | 
         "false_positive_reduction_rate": false_positive_reduction_rate,
         "manual_review_rate": manual_review_rate,
         "coverage": coverage,
+        "decided_accuracy": decided_accuracy,
         "decision_rate": coverage,
         "abstention_rate": abstention_rate,
         "selective_precision": selective_precision,

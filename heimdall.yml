@@ -20,7 +20,8 @@ active_validation:
     - "http://localhost:5005"
   allow_external_targets: false
   request_timeout_seconds: 2
-  max_requests_per_alert: 2
+  max_requests_per_alert: 1
+  response_body_limit_bytes: 65536
 
 llm:
   provider: "mock"
