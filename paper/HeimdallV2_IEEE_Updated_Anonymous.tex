@@ -1,0 +1,36 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\title{Heimdall V2: Safety-First LLM-Assisted SAST Triage with Local DAST Validation}
+\author{Anonymous Authors}
+\begin{document}
+\maketitle
+\begin{abstract}
+This draft evaluates Heimdall V2 on a reproducible 360-alert benchmark combining synthetic SAST findings with localhost-only active validation fixtures.
+\end{abstract}
+\section{Introduction}
+Static Application Security Testing can produce high alert volume and false positives. Heimdall V2 investigates a safety-first triage workflow that combines mockable LLM reasoning, deterministic payload hypotheses, and local DAST validation.
+\section{Method}
+The benchmark compares SAST-only, rule-based filtering, LLM-only stub, full-pipeline stub, dry-run mock, and active-local validation modes. Active validation is restricted to 127.0.0.1 fixtures.
+\section{Results}
+\begin{table}[h]
+\centering
+\caption{Main metrics by mode}
+\begin{tabular}{lrrrr}
+\toprule
+Mode & Precision & Recall & F1 & Review \\
+\midrule
+sast_only & 0.5667 & 1.0000 & 0.7234 & 0.0000 \\
+rule_based_filtering & 0.9412 & 1.0000 & 0.9697 & 0.8111 \\
+llm_only_stub & 0.9420 & 1.0000 & 0.9701 & 0.6139 \\
+heimdall_full_pipeline_stub & 0.0000 & 0.0000 & 0.0000 & 0.6667 \\
+heimdall_dry_run_mock & 0.0000 & 0.0000 & 0.0000 & 0.6667 \\
+heimdall_active_local_validation & 1.0000 & 1.0000 & 1.0000 & 0.8667 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\section{Safety and Limitations}
+No public websites, production domains, or third-party systems are scanned. Results are controlled prototype evidence and should be expanded with authorized benchmarks before submission.
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+\end{document}

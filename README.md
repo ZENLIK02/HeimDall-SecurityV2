@@ -5,11 +5,11 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-v0.1.0--alpha-orange)](CHANGELOG.md)
 
-Heimdall is **an open-source DevSecOps validation backend that reduces SAST false positives using LLM-assisted reasoning and safe DAST-style verification**.
+Heimdall is **an open-source post-SAST validation backend that uses deterministic, loopback-only bounded DAST probes to collect runtime evidence**.
 
-It is for AppSec engineers, DevSecOps teams, students, and researchers who want to test whether static findings can be converted into evidence-backed decisions: `True Positive`, `False Positive`, or `Needs Review`.
+It is for AppSec engineers, DevSecOps teams, students, and researchers who want to test whether static findings can be converted into evidence-backed decisions: `Confirmed`, `Not Reproduced Under Test`, or `Needs Review`.
 
-Heimdall is an alpha-stage research/backend tool. It is not a production-ready enterprise platform, and it should only be tested on repositories and targets you own or are authorized to assess.
+Heimdall is an alpha-stage research/backend tool. It is not a production-ready enterprise platform, and it should only be tested on the included loopback fixtures or other explicitly authorized local test targets. No LLM is used by the bounded DAST evaluation path.
 
 ## Current Research Package Summary
 
@@ -65,6 +65,17 @@ Run the final reproducibility workflow:
 bash scripts/run_ieee_final_evaluation.sh
 ```
 
+Run only the bounded DAST protocol on an alert manifest:
+
+```bash
+python -m heimdall.cli bounded-dast \
+  --dataset test_data/heimdall_active_local_alerts.jsonl \
+  --config heimdall.yml \
+  --output reports/bounded_dast
+```
+
+The command writes JSON, CSV, and Markdown audit reports. Each executable alert can cause exactly one request. Alerts without an authorized runtime mapping or sufficient evidence predicate are not sent and return `Needs Review`.
+
 The latest full run passed `53` tests.
 
 ## 5-Minute Quickstart
@@ -96,9 +107,10 @@ SAST tools are valuable because they scale across a codebase, but they often pro
 
 - ingests Semgrep JSON,
 - extracts alert context,
-- uses structured LLM-style reasoning through a mock provider by default,
-- generates non-destructive validation hypotheses,
-- performs dry-run or allowlisted DAST-style validation,
+- consumes an explicitly authorized fixed validation mapping,
+- screens the endpoint and payload before execution,
+- performs one non-destructive request against an exact loopback allowlist,
+- checks declared positive and negative runtime evidence predicates,
 - explains the final decision,
 - produces CI/CD-friendly reports.
 
@@ -106,24 +118,27 @@ SAST tools are valuable because they scale across a codebase, but they often pro
 
 ```mermaid
 flowchart LR
-    A[Semgrep SAST JSON] --> B[Context Extraction]
-    B --> C[Prompt Guard]
-    C --> D[LLM-Assisted Reasoning]
-    D --> E[Safe Payload Generation]
-    E --> F[Dry-Run / Allowlisted DAST]
-    F --> G[Response Analyzer]
-    G --> H[Decision Engine]
-    H --> I[Markdown / JSON / CSV Reports]
+    A[Existing SAST alert] --> B[Authorized fixed probe mapping]
+    B --> C[Safety preflight]
+    C --> D[One loopback-only GET or POST]
+    D --> E[Declared evidence predicates]
+    E --> F[Confirmed / Not Reproduced / Needs Review]
+    F --> G[Markdown / JSON / CSV audit reports]
 ```
+
+Legacy mock-LLM and dry-run baseline modules remain in the repository for historical comparison, but they are not on the bounded DAST evaluation path.
 
 ## Why It Is Safe To Test
 
 - Dry-run validation is enabled by default.
-- Mock LLM mode is enabled by default.
-- Active DAST is limited to configured `allowed_targets`.
-- Production-looking domains are blocked unless explicitly enabled.
-- Destructive payload markers are rejected.
-- All DAST attempts are logged.
+- Bounded DAST must be enabled explicitly and is limited to exact configured loopback origins.
+- Exactly one request is permitted for each executable alert.
+- Only GET and POST are supported.
+- Absolute endpoints, credentials in URLs, endpoint fragments, destructive payload markers, oversized payloads, and external URLs embedded in probes are blocked.
+- Redirects are inspected but never followed.
+- Response capture is bounded and reports store a digest rather than a body excerpt.
+- All sent and blocked attempts are logged.
+- Missing positive or negative evidence routes the alert to `Needs Review`.
 - `Needs Review` does not fail CI by default.
 
 ## CLI Commands
@@ -241,11 +256,11 @@ Docker runs the sample validation command in dry-run mode.
 ## Current Limitations
 
 - Alpha-stage research backend.
-- Default validation is conservative and dry-run based.
+- Bounded DAST requires an alert-to-runtime mapping and an authorized local test target.
 - Business logic flaws often need multi-step authenticated context.
-- Real LLM provider integration is intentionally behind schema validation.
 - The included datasets are small and synthetic.
-- External target validation requires careful allowlist configuration.
+- The bounded DAST protocol intentionally rejects non-loopback targets.
+- A not-reproduced result is not proof that a SAST alert is a false positive and does not authorize automatic suppression.
 
 ## Roadmap
 

@@ -36,6 +36,11 @@ def health():
     return jsonify({"status": "ok", "service": "heimdall-local-lab"})
 
 
+@app.get("/test/large-response")
+def large_response():
+    return "HEIMDALL_LARGE_MARKER" + ("A" * 70000)
+
+
 @app.get("/xss/vulnerable")
 def xss_vulnerable():
     marker = request.args.get("marker", "HEIMDALL_XSS_MARKER")

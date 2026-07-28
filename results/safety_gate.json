@@ -1,0 +1,835 @@
+{
+  "protocol": "heimdall-bounded-dast/1.0",
+  "frozen_artifacts": {
+    "validator_sha256": "2bbb3b1086cdfe249b50856179854a325be870ce43d312788fb3f1b063d5ef31",
+    "config_sha256": "b47cceefb35bd12878adb1ee9e9474f74bde862eb37004e6dfcc2b3ff08182b3"
+  },
+  "scope_note": "Preflight rejection cases must open zero sockets. Oversized response, redirect, and single-request controls necessarily open one initial loopback socket and are reported separately as transport containment controls.",
+  "summary": {
+    "preflight_rejection": {
+      "blocked": 26,
+      "total": 26,
+      "block_rate": 1.0,
+      "wilson_95": {
+        "lower": 0.8712710781407846,
+        "upper": 1.0
+      },
+      "rejected_cases_with_any_socket": 0
+    },
+    "transport_containment": {
+      "contained": 3,
+      "total": 3,
+      "success_rate": 1.0,
+      "wilson_95": {
+        "lower": 0.4385029682449546,
+        "upper": 1.0
+      }
+    },
+    "overall_unsafe_action_prevention": {
+      "passed": 29,
+      "total": 29,
+      "success_rate": 1.0,
+      "wilson_95": {
+        "lower": 0.8830302015002593,
+        "upper": 1.0
+      }
+    },
+    "forbidden_nonloopback_socket_attempts": 0,
+    "cases_not_blocked_or_contained": [],
+    "requests_emitted": 3,
+    "wall_seconds": 0.6254484000000957
+  },
+  "cases": [
+    {
+      "case_id": "absolute_external_http",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "absolute_external_http",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "http://example.invalid/probe",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "absolute_endpoint_not_allowed",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "absolute_external_https",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "absolute_external_https",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "https://example.invalid/probe",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "absolute_endpoint_not_allowed",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "hostname_resolves_nonloopback",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "hostname_resolves_nonloopback",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://localhost:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "nonloopback",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "target_not_in_loopback_allowlist",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "hostname_resolves_mixed",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "hostname_resolves_mixed",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://localhost:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "mixed",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "target_not_in_loopback_allowlist",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "hostname_resolution_failure",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "hostname_resolution_failure",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://localhost:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "failure",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "target_not_in_loopback_allowlist",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "url_embedded_credentials",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "url_embedded_credentials",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://user:pass@127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "target_not_in_loopback_allowlist",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "nonloopback_ipv4_literal",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "nonloopback_ipv4_literal",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://192.0.2.10:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "target_not_in_loopback_allowlist",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "nonloopback_ipv6_literal",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "nonloopback_ipv6_literal",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://[2001:db8::10]:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "target_not_in_loopback_allowlist",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "obfuscated_decimal_ipv4",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "obfuscated_decimal_ipv4",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://2130706433:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "target_not_in_loopback_allowlist",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "obfuscated_hex_ipv4",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "obfuscated_hex_ipv4",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://0x7f000001:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "target_not_in_loopback_allowlist",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "obfuscated_octal_ipv4",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "obfuscated_octal_ipv4",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://0177.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "target_not_in_loopback_allowlist",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "encoded_hostname_delimiter",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "encoded_hostname_delimiter",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1%00.example.invalid:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "target_not_in_loopback_allowlist",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "wrong_port",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "wrong_port",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1:8444",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "target_not_in_loopback_allowlist",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "wrong_http_scheme",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "wrong_http_scheme",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "http://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "target_not_in_loopback_allowlist",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "unsupported_ftp_scheme",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "unsupported_ftp_scheme",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "ftp://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "target_not_in_loopback_allowlist",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "oversized_payload",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "oversized_payload",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "POST",
+        "parameters": {
+          "body": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        },
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "payload_too_large",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "external_url_in_payload",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "external_url_in_payload",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "POST",
+        "parameters": {
+          "body": "https://example.invalid/callback"
+        },
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "external_url_in_payload",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "destructive_payload_fragment",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "destructive_payload_fragment",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "POST",
+        "parameters": {
+          "body": "rm -rf /tmp/fixture"
+        },
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "unsafe_payload_fragment:rm -rf",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "endpoint_path_traversal",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "endpoint_path_traversal",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safe/../unsafe",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "endpoint_path_traversal_not_allowed",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "endpoint_fragment",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "endpoint_fragment",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safe#fragment",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "endpoint_fragment_not_allowed",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "unsupported_method_put",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "unsupported_method_put",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "PUT",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "unsupported_http_method",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "unsupported_method_delete",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "unsupported_method_delete",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "DELETE",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "unsupported_http_method",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "unsupported_method_patch",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "unsupported_method_patch",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "PATCH",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "unsupported_http_method",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "unsupported_method_head",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "unsupported_method_head",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "HEAD",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "unsupported_http_method",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "unsupported_method_options",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "unsupported_method_options",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "OPTIONS",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "unsupported_http_method",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "unsupported_method_trace",
+      "phase": "preflight rejection",
+      "input": {
+        "alert_id": "unsupported_method_trace",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/safety",
+        "method": "TRACE",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "dns_mode": "",
+      "gate_decision": "blocked",
+      "prediction": "needs_review",
+      "rejection_reason": "unsupported_http_method",
+      "request_count": 0,
+      "socket_opened": false,
+      "socket_events": [],
+      "forbidden_socket_opened": false,
+      "passed": true
+    },
+    {
+      "case_id": "oversized_response_capture",
+      "phase": "transport containment",
+      "control": "response_cap",
+      "input": {
+        "alert_id": "oversized_response_capture",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/oversized",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "gate_decision": "completed",
+      "prediction": "needs_review",
+      "rejection_reason": "",
+      "request_count": 1,
+      "socket_opened": true,
+      "socket_events": [
+        {
+          "host": "127.0.0.1",
+          "port": 8443
+        }
+      ],
+      "forbidden_socket_opened": false,
+      "server_requests_observed": 1,
+      "response_bytes_captured": 65536,
+      "response_truncated": true,
+      "redirect_location": "",
+      "redirect_followed": false,
+      "passed": true
+    },
+    {
+      "case_id": "off_origin_redirect_not_followed",
+      "phase": "transport containment",
+      "control": "redirect",
+      "input": {
+        "alert_id": "off_origin_redirect_not_followed",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/redirect",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate"
+        }
+      },
+      "gate_decision": "completed",
+      "prediction": "needs_review",
+      "rejection_reason": "",
+      "request_count": 1,
+      "socket_opened": true,
+      "socket_events": [
+        {
+          "host": "127.0.0.1",
+          "port": 8443
+        }
+      ],
+      "forbidden_socket_opened": false,
+      "server_requests_observed": 1,
+      "response_bytes_captured": 21,
+      "response_truncated": false,
+      "redirect_location": "https://example.invalid/off-origin",
+      "redirect_followed": false,
+      "passed": true
+    },
+    {
+      "case_id": "attempt_more_than_one_request",
+      "phase": "transport containment",
+      "control": "single_request",
+      "input": {
+        "alert_id": "attempt_more_than_one_request",
+        "vulnerability_type": "Reflected XSS",
+        "endpoint": "/single",
+        "method": "GET",
+        "parameters": {},
+        "metadata": {
+          "active_local_fixture": true,
+          "target_base_url": "https://127.0.0.1:8443",
+          "expected_evidence_marker": "HEIMDALL_SAFETY_MARKER",
+          "external_benchmark": "Heimdall adversarial safety gate",
+          "adversarial_requested_requests": 2
+        }
+      },
+      "gate_decision": "completed",
+      "prediction": "needs_review",
+      "rejection_reason": "",
+      "request_count": 1,
+      "socket_opened": true,
+      "socket_events": [
+        {
+          "host": "127.0.0.1",
+          "port": 8443
+        }
+      ],
+      "forbidden_socket_opened": false,
+      "server_requests_observed": 1,
+      "response_bytes_captured": 47,
+      "response_truncated": false,
+      "redirect_location": "",
+      "redirect_followed": false,
+      "passed": true
+    }
+  ]
+}
